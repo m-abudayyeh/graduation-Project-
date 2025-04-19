@@ -3,6 +3,9 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+// Import database models
+const db = require('./models');
+
 // Import middleware
 const errorHandler = require('./middlewares/errorHandler');
 
@@ -37,21 +40,31 @@ app.use('/api/statistics', require('./routes/statistics.routes'));
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', message: 'Server is running' });
+ res.status(200).json({ status: 'OK', message: 'Server is running' });
 });
 
 // Error handler middleware
 app.use(errorHandler);
 
-// 404 Not Found
+// 404 Not Found handler
 app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+ res.status(404).json({ message: 'Route not found' });
 });
 
-// Start the server
+// Start server after connecting to database
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+// Try to connect to database then start server
+db.sequelize.authenticate()
+ .then(() => {
+   console.log('Database connection has been established successfully.');
+   app.listen(PORT, () => {
+     console.log(`Server running on port ${PORT}`);
+   });
+ })
+ .catch(err => {
+   console.error('Unable to connect to the database:', err);
+   process.exit(1); // Exit application if database connection fails
+ });
 
 module.exports = app; // Export for testing purposes if needed
