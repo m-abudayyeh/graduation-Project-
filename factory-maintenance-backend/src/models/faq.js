@@ -1,39 +1,28 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  const ContactMessage = sequelize.define('ContactMessage', {
-    name: {
+  const FAQ = sequelize.define('FAQ', {
+    question: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        isEmail: true
-      }
-    },
-    subject: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    message: {
+    answer: {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    isRead: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+    category: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
-    isReplied: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+    order: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     }
   }, {});
 
-  ContactMessage.associate = function(models) {
+  FAQ.associate = function(models) {
     // No associations needed for this model
   };
 
-  return ContactMessage;
+  return FAQ;
 };
