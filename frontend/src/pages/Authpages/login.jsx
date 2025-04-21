@@ -1,18 +1,68 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Facebook, Twitter } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const LoginPage = () => {
+const Login = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    rememberMe: false
+  });
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login with data:', { username, password, rememberMe });
+    setLoading(true);
+    setError(null);
     
-    // Note: In a real application, you would use Axios here
-    // You'll need to install and import it in your project
+    try {
+      // Make the login request to your backend
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        email: formData.email,
+        password: formData.password
+      });
+      
+      // Check if we have a successful response with token
+      if (response.data && response.data.data && response.data.data.token) {
+        // Store token in localStorage or sessionStorage based on "remember me" choice
+        const storage = formData.rememberMe ? localStorage : sessionStorage;
+        storage.setItem('token', response.data.data.token);
+        
+        // Store user data if available
+        if (response.data.data.user) {
+          storage.setItem('user', JSON.stringify(response.data.data.user));
+        }
+        
+        // Redirect to dashboard
+        navigate('/dashboard');
+      } else {
+        // Handle unexpected response format
+        setError('Received invalid response from server. Please try again.');
+      }
+    } catch (err) {
+      // Handle login errors
+      console.error('Login error:', err);
+      
+      if (err.response && err.response.data) {
+        setError(err.response.data.message || 'Login failed. Please check your credentials.');
+      } else {
+        setError('Network error occurred. Please check your connection and try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,17 +85,25 @@ const LoginPage = () => {
 
         <div className="w-16 h-1 bg-[#FF5E14] mx-auto mb-6"></div>
         
-        <h2 className="text-[#F5F5F5] text-xl mb-8">Welcom Back</h2>
+        <h2 className="text-[#F5F5F5] text-xl mb-8 font-semibold">Login to your Account</h2>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Username Field */}
+        {/* Display error message if any */}
+        {error && (
+          <div className="bg-red-500/20 border border-red-500 text-red-100 px-4 py-2 rounded-md mb-4">
+            {error}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email Field */}
           <div className="relative">
             <input 
-              type="text" 
-              placeholder="Username"
+              type="email" 
+              name="email"
+              placeholder="Email"
               className="w-full py-3 px-4 bg-white/20 text-[#F5F5F5] placeholder-[#F5F5F5]/70 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF5E14]"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={formData.email}
+              onChange={handleChange}
               required
             />
           </div>
@@ -54,10 +112,11 @@ const LoginPage = () => {
           <div className="relative">
             <input 
               type={showPassword ? "text" : "password"} 
+              name="password"
               placeholder="Password"
               className="w-full py-3 px-4 bg-white/20 text-[#F5F5F5] placeholder-[#F5F5F5]/70 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF5E14]"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleChange}
               required
             />
             <button 
@@ -69,44 +128,57 @@ const LoginPage = () => {
             </button>
           </div>
           
-          {/* Sign In Button */}
-          <button 
-            type="submit" 
-            className="w-full py-3 bg-[#FF5E14] hover:bg-[#FF5E14]/90 text-white font-medium rounded-md transition-colors duration-300"
-          >
-            SIGN IN
-          </button>
-          
-          {/* Remember Me and Forgot Password */}
-          <div className="flex items-center justify-between text-[#F5F5F5] text-sm">
+          {/* Remember Me & Forgot Password */}
+          <div className="flex justify-between items-center text-[#F5F5F5] text-sm">
             <div className="flex items-center space-x-2">
               <input 
                 type="checkbox" 
-                id="remember"
+                id="rememberMe"
+                name="rememberMe"
                 className="w-4 h-4 accent-[#FF5E14]"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
+                checked={formData.rememberMe}
+                onChange={handleChange}
               />
-              <label htmlFor="remember" className="cursor-pointer">Remember Me</label>
+              <label htmlFor="rememberMe" className="cursor-pointer">Remember me</label>
             </div>
-            <a href="#" className="text-[#F5F5F5] hover:text-[#FF5E14] transition-colors duration-300">
-              Forgot Password
-            </a>
+            
+            <button 
+              type="button" 
+              className="text-[#FF5E14] hover:underline"
+              onClick={() => navigate('/forgot-password')}
+            >
+              Forgot Password?
+            </button>
           </div>
+          
+          {/* Login Button */}
+          <button 
+            type="submit" 
+            className="w-full py-3 bg-[#FF5E14] hover:bg-[#FF5E14]/90 text-white font-medium rounded-md transition-colors duration-300 disabled:opacity-70"
+            disabled={loading}
+          >
+            {loading ? 'LOGGING IN...' : 'LOGIN'}
+          </button>
         </form>
         
-        {/* Or Sign In With */}
-        <div className="mt-8 text-center">
+        {/* Sign Up Option */}
+        <div className="mt-4 text-center">
           <div className="flex items-center justify-center">
             <div className="flex-1 h-px bg-[#5F656F]/30"></div>
-            <p className="mx-4 text-[#F5F5F5]">Don't have account </p>
+            <p className="mx-4 text-[#F5F5F5]">Don't have an account?</p>
             <div className="flex-1 h-px bg-[#5F656F]/30"></div>
           </div>
-
+          <button 
+            type="button"
+            onClick={() => navigate('/register')}
+            className="inline-block mt-4 text-[#F5F5F5] hover:text-[#FF5E14] transition-colors duration-300"
+          >
+            Sign Up
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default Login;

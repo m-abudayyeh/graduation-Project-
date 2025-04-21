@@ -7,8 +7,8 @@ import PublicLayout from './components/PublicLayout';
 
 // Import pages
 import Home from './pages/puplicpage/Home';
-import About from './pages/puplicpage/about';
-import Contact from './pages/puplicpage/contact';
+import AboutUs from './pages/puplicpage/about';
+import ContactPage from './pages/puplicpage/contact';
 import Login from './pages/Authpages/login';
 import Register from './pages/Authpages/register';
 
@@ -44,8 +44,8 @@ function App() {
         {/* Public routes with Navbar */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactPage />} />
         </Route>
 
         <Route>

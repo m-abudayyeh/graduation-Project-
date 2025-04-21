@@ -1,8 +1,14 @@
+
 import React, { useState } from 'react';
 import { Eye, EyeOff, Facebook, Twitter } from 'lucide-react';
+import axios from 'axios'; // Make sure axios is installed in your project
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -21,12 +27,42 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Registration data:', formData);
     
-    // Note: In a real application, you would use Axios here
-    // You'll need to install and import it in your project
+    // Reset status messages
+    setError('');
+    setSuccess('');
+    setLoading(true);
+    
+    try {
+      // Send registration data to the backend API
+      const response = await axios.post('http://localhost:5000/api/auth/register', {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        password: formData.password,
+        companyName: formData.companyName
+      });
+      
+      console.log('Registration successful:', response.data);
+      setSuccess('Registration successful! Redirecting to login...');
+      
+      // Redirect to login page after successful registration
+      setTimeout(() => {
+        window.location.href = '/login'; // Adjust the path as needed
+      }, 2000);
+      
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError(
+        err.response?.data?.message || 
+        'Registration failed. Please try again later.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,6 +86,19 @@ const Register = () => {
         <div className="w-16 h-1 bg-[#FF5E14] mx-auto mb-6"></div>
         
         <h2 className="text-[#F5F5F5] text-xl mb-8 font-semibold">Create New Account</h2>
+        
+        {/* Status Messages */}
+        {error && (
+          <div className="mb-4 p-2 bg-red-500/20 text-red-100 rounded-md">
+            {error}
+          </div>
+        )}
+        
+        {success && (
+          <div className="mb-4 p-2 bg-green-500/20 text-green-100 rounded-md">
+            {success}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* First Name & Last Name Fields (side by side) */}
@@ -159,9 +208,10 @@ const Register = () => {
           {/* Sign Up Button */}
           <button 
             type="submit" 
-            className="w-full py-3 bg-[#FF5E14] hover:bg-[#FF5E14]/90 text-white font-medium rounded-md transition-colors duration-300"
+            className="w-full py-3 bg-[#FF5E14] hover:bg-[#FF5E14]/90 text-white font-medium rounded-md transition-colors duration-300 disabled:bg-[#FF5E14]/50"
+            disabled={loading}
           >
-            SIGN UP
+            {loading ? 'SIGNING UP...' : 'SIGN UP'}
           </button>
         </form>
         
@@ -172,7 +222,7 @@ const Register = () => {
             <p className="mx-4 text-[#F5F5F5]">Already have an account?</p>
             <div className="flex-1 h-px bg-[#5F656F]/30"></div>
           </div>
-          <a href="#" className="inline-block mt-4 text-[#F5F5F5] hover:text-[#FF5E14] transition-colors duration-300">
+          <a href="/login" className="inline-block mt-4 text-[#F5F5F5] hover:text-[#FF5E14] transition-colors duration-300">
             Sign In
           </a>
         </div>
