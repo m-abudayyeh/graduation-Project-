@@ -1,20 +1,14 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-// Verify JWT token
+// Verify JWT token from cookie
 exports.authenticateToken = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader) {
-      return res.status(401).json({ message: 'Access denied. No token provided.' });
-    }
-
-    // Extract token from Bearer format
-    const token = authHeader.split(' ')[1];
+    // Get token from cookie instead of header
+    const token = req.cookies.jwt;
     
     if (!token) {
-      return res.status(401).json({ message: 'Access denied. Invalid token format.' });
+      return res.status(401).json({ message: 'Access denied. Please log in to access this resource.' });
     }
 
     // Verify token
@@ -26,7 +20,9 @@ exports.authenticateToken = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid token. User not found.' });
+      // Clear invalid cookie
+      res.clearCookie('jwt');
+      return res.status(401).json({ message: 'Invalid session. Please log in again.' });
     }
 
     // Attach user to request
@@ -34,11 +30,14 @@ exports.authenticateToken = async (req, res, next) => {
     
     next();
   } catch (error) {
+    // Clear cookie on error
+    res.clearCookie('jwt');
+    
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Token expired' });
+      return res.status(401).json({ message: 'Your session has expired. Please log in again.' });
     }
     
-    return res.status(401).json({ message: 'Invalid token' });
+    return res.status(401).json({ message: 'Invalid session. Please log in again.' });
   }
 };
 

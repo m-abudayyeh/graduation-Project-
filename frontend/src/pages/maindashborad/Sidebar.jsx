@@ -84,10 +84,7 @@ const Sidebar = ({ isOpen, toggleSidebar, user, companyInfo }) => {
             );
           })}
         </ul>
-      </div>
-      
-      {/* User Profile at Bottom */}
-  
+      </div>  
     </div>
   );
 };

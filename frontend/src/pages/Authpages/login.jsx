@@ -28,21 +28,26 @@ const Login = () => {
     setError(null);
     
     try {
+      // تكوين axios لإرسال واستقبال الكوكيز
+      axios.defaults.withCredentials = true;
+      
       // Make the login request to your backend
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         email: formData.email,
         password: formData.password
       });
       
-      // Check if we have a successful response with token
-      if (response.data && response.data.data && response.data.data.token) {
-        // Store token in localStorage or sessionStorage based on "remember me" choice
+      // Check if we have a successful response with user data
+      if (response.data && response.data.data && response.data.data.user) {
+        // تخزين بيانات المستخدم فقط (لاحظ أننا لم نعد نخزن التوكن)
         const storage = formData.rememberMe ? localStorage : sessionStorage;
-        storage.setItem('token', response.data.data.token);
+        storage.setItem('user', JSON.stringify(response.data.data.user));
         
-        // Store user data if available
-        if (response.data.data.user) {
-          storage.setItem('user', JSON.stringify(response.data.data.user));
+        // يمكنك أيضًا تخزين حالة تذكرني إذا أردت استخدامها لاحقًا
+        if (formData.rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        } else {
+          localStorage.removeItem('rememberMe');
         }
         
         // Redirect to dashboard

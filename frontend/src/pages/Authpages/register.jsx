@@ -1,9 +1,10 @@
-
 import React, { useState } from 'react';
 import { Eye, EyeOff, Facebook, Twitter } from 'lucide-react';
 import axios from 'axios'; // Make sure axios is installed in your project
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -36,6 +37,9 @@ const Register = () => {
     setLoading(true);
     
     try {
+      // تكوين axios لإرسال واستقبال الكوكيز
+      axios.defaults.withCredentials = true;
+      
       // Send registration data to the backend API
       const response = await axios.post('http://localhost:5000/api/auth/register', {
         firstName: formData.firstName,
@@ -51,7 +55,7 @@ const Register = () => {
       
       // Redirect to login page after successful registration
       setTimeout(() => {
-        window.location.href = '/login'; // Adjust the path as needed
+        navigate('/login'); // استخدام navigate بدل window.location.href
       }, 2000);
       
     } catch (err) {
@@ -101,6 +105,7 @@ const Register = () => {
         )}
         
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Form fields remain the same */}
           {/* First Name & Last Name Fields (side by side) */}
           <div className="flex space-x-4">
             <div className="relative flex-2">
@@ -222,7 +227,10 @@ const Register = () => {
             <p className="mx-4 text-[#F5F5F5]">Already have an account?</p>
             <div className="flex-1 h-px bg-[#5F656F]/30"></div>
           </div>
-          <a href="/login" className="inline-block mt-4 text-[#F5F5F5] hover:text-[#FF5E14] transition-colors duration-300">
+          <a 
+            onClick={() => navigate('/login')} 
+            className="inline-block mt-4 text-[#F5F5F5] hover:text-[#FF5E14] transition-colors duration-300 cursor-pointer"
+          >
             Sign In
           </a>
         </div>

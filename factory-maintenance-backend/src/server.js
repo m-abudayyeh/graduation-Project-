@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const cookieParser = require('cookie-parser'); 
 require('dotenv').config();
 
 // Import database models
@@ -12,8 +13,14 @@ const errorHandler = require('./middlewares/errorHandler');
 // Create Express app
 const app = express();
 
-// Enable CORS
-app.use(cors());
+// Enable CORS with credentials support
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  credentials: true
+}));
+
+// Add cookie parser middleware before routes
+app.use(cookieParser()); 
 
 // Parse JSON and URL-encoded bodies
 app.use(express.json());
@@ -66,5 +73,6 @@ db.sequelize.authenticate()
    console.error('Unable to connect to the database:', err);
    process.exit(1); // Exit application if database connection fails
  });
+
 
 module.exports = app; // Export for testing purposes if needed

@@ -12,7 +12,6 @@ const MainDashboard = () => {
     status: 'On shift',
     email: 'john.doe@example.com',
     phone: '+1 (555) 123-4567',
-    department: 'Maintenance',
     profilePicture: null // Add actual URL for profile picture
   });
   

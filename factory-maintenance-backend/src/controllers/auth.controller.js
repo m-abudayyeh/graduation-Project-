@@ -132,6 +132,14 @@ exports.login = async (req, res, next) => {
 
     // Generate JWT token
     const token = jwtUtils.generateToken(user);
+    
+    // Set token in HTTP-only cookie
+    res.cookie('jwt', token, {
+      httpOnly: true,              // منع الوصول من JavaScript
+      secure: process.env.NODE_ENV === 'production', // استخدام HTTPS في الإنتاج فقط
+      sameSite: 'strict',          // حماية من هجمات CSRF
+      maxAge: parseInt(process.env.JWT_EXPIRES_IN) * 1000 || 24 * 60 * 60 * 1000  // صلاحية التوكن
+    });
 
     // Return user data without password
     const userData = { ...user.get() };
@@ -140,7 +148,22 @@ exports.login = async (req, res, next) => {
     delete userData.passwordResetToken;
     delete userData.passwordResetExpires;
 
-    return responseHandler.success(res, 200, 'Login successful', { user: userData, token });
+    return responseHandler.success(res, 200, 'Login successful', { user: userData });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * User logout
+ * @route POST /api/auth/logout
+ */
+exports.logout = async (req, res, next) => {
+  try {
+    // Clear JWT cookie
+    res.clearCookie('jwt');
+    
+    return responseHandler.success(res, 200, 'Logged out successfully');
   } catch (error) {
     next(error);
   }

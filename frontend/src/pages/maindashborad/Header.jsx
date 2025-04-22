@@ -1,12 +1,36 @@
 // src/components/Header.jsx
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import ProfileModal from './ProfileModal';
 
 const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const navigate = useNavigate();
   
   const toggleProfileMenu = () => {
     setShowProfileMenu(!showProfileMenu);
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Call the logout API endpoint
+      await axios.post('http://localhost:5000/api/auth/logout');
+      
+      // Clear session storage
+      sessionStorage.clear();
+      
+      // Execute any additional logout logic provided by the parent component
+      if (onLogout) {
+        onLogout();
+      }
+      
+      // Redirect to the home page
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
   
   return (
@@ -28,18 +52,6 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
             </h1>
           </div>
           
-          {/* <div className="relative ml-4">
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              className="pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#FF5E14] w-64"
-            />
-            <div className="absolute left-3 top-2.5 text-gray-400">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
-            </div>
-          </div> */}
         </div>
         
         <div className="flex items-center space-x-6">
@@ -97,12 +109,20 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
                   <p className="px-4 py-1 text-sm font-semibold">{user?.email || 'user@example.com'}</p>
                 </div>
                 <div className="py-1">
-                  <Link to="/dashboard/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</Link>
+                  <button 
+                    onClick={() => {
+                      setShowProfileModal(true);
+                      setShowProfileMenu(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Your Profile
+                  </button>
                   <Link to="/dashboard/company" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Company Profile</Link>
                 </div>
                 <div className="py-1 border-t border-gray-100">
                   <button
-                    onClick={onLogout}
+                    onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                   >
                     Sign out
@@ -113,6 +133,19 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
           </div>
         </div>
       </div>
+      
+      {/* Profile Modal */}
+      <ProfileModal 
+        isOpen={showProfileModal} 
+        onClose={() => setShowProfileModal(false)} 
+        user={user}
+        onUpdate={(updatedUser) => {
+          // Handle the updated user data here, e.g. by passing it to a parent component
+          // This callback will be called when the profile is successfully updated
+          console.log('Profile updated:', updatedUser);
+          // You might want to update the user state in a parent component
+        }}
+      />
     </header>
   );
 };

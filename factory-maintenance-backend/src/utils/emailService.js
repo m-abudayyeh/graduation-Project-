@@ -214,7 +214,7 @@ exports.sendVerificationEmail = async (user, token) => {
  * Send password reset email
  */
 exports.sendPasswordResetEmail = async (user, token) => {
-  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
   return this.sendEmail({
     to: user.email,
