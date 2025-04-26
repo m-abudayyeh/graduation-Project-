@@ -15,7 +15,8 @@ exports.generateToken = (user) => {
       companyId: user.companyId
     },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN }
+    // { expiresIn: process.env.JWT_EXPIRES_IN }
+    { expiresIn:  100000000000000000}
   );
 };
 

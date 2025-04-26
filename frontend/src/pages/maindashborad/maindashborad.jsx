@@ -3,17 +3,41 @@ import { useState, useEffect } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import axios from 'axios';
 
 const MainDashboard = () => {
+  const [Company, setCompany] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [user, setUser] = useState({ 
-    name: 'mohammed', 
-    role: 'Administrator',
-    status: 'On shift',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    profilePicture: null // Add actual URL for profile picture
-  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/auth/me', {
+          withCredentials: true
+        });
+
+        setUser(response.data.data);
+         console.log(response.data.data)
+        setLoading(false);
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to fetch user data');
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+  // const [user, setUser] = useState({ 
+  //   name: 'mohammed', 
+  //   role: 'Administrator',
+  //   status: 'On shift',
+  //   email: 'john.doe@example.com',
+  //   phone: '+1 (555) 123-4567',
+  //   profilePicture: null // Add actual URL for profile picture
+  // });
   
   const [companyInfo, setCompanyInfo] = useState({
     name: 'test Industrial Solutions',
@@ -59,7 +83,9 @@ const MainDashboard = () => {
   // Check if we're at the dashboard home route
   const location = useLocation();
   const isDashboardHome = location.pathname === '/dashboard';
-
+  if (loading) return <div>Loading user information...</div>;
+  if (error) return <div className="error-message">Error: {error}</div>;
+  if (!user) return <div>No user information available</div>;
   return (
     <div className="flex h-screen bg-[#F5F5F5] overflow-hidden">
       {/* Sidebar */}
