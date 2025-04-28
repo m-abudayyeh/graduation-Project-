@@ -44,6 +44,18 @@ const EmployeeForm = ({ employee, onClose, onSuccess }) => {
     fetchCurrentUser();
   }, []);
 
+  // Auto-generate password when firstName changes
+  useEffect(() => {
+    if (!isEditing && formData.firstName && !formData.password) {
+      const generatedPassword = `${formData.firstName}@123`;
+      setFormData(prev => ({
+        ...prev,
+        password: generatedPassword,
+        confirmPassword: generatedPassword
+      }));
+    }
+  }, [formData.firstName, isEditing]);
+
   // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -360,6 +372,11 @@ const EmployeeForm = ({ employee, onClose, onSuccess }) => {
             </div>
             {errors.password && (
               <p className="mt-1 text-sm text-red-500">{errors.password}</p>
+            )}
+            {!isEditing && formData.firstName && (
+              <p className="mt-1 text-xs text-gray-500">
+                Password auto-generated from first name. You can edit if needed.
+              </p>
             )}
           </div>
           
