@@ -1,8 +1,16 @@
 // src/components/Sidebar.jsx
 import { useLocation, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 const Sidebar = ({ isOpen, toggleSidebar, user, companyInfo }) => {
   const location = useLocation();
+  const [logoError, setLogoError] = useState(false);
+  
+  // Reset logo error state when companyInfo changes
+  useEffect(() => {
+    setLogoError(false);
+  }, [companyInfo]);
+
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
     { name: 'Work Orders', path: '/dashboard/work-orders', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4' },
@@ -15,6 +23,19 @@ const Sidebar = ({ isOpen, toggleSidebar, user, companyInfo }) => {
     { name: 'Employees', path: '/dashboard/employees', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
   ];
 
+  // Helper function to get the image URL
+  const getLogoUrl = () => {
+    if (!companyInfo || !companyInfo.logo) return null;
+    
+    // Check if logo URL already contains the base URL
+    if (companyInfo.logo.startsWith('http')) {
+      return companyInfo.logo;
+    }
+    
+    // Otherwise, prepend the base URL
+    return `http://localhost:5000/${companyInfo.logo}`;
+  };
+
   return (
     <div 
       className={`h-screen bg-[#02245B] text-white overflow-y-auto transition-all duration-300 ${
@@ -25,15 +46,44 @@ const Sidebar = ({ isOpen, toggleSidebar, user, companyInfo }) => {
       <div className="p-4 flex flex-col items-center border-b border-[#5F656F]/30">
         {isOpen ? (
           <div className="flex flex-col items-center w-full">
-            <div className="h-16 w-16 bg-[#FF5E14] rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">
-              {companyInfo?.logo || companyInfo?.name?.charAt(0) || 'M'}
-            </div>
-            <h2 className="text-xl font-bold text-center">{companyInfo?.name || 'MaintenX'}</h2>
-            <p className="text-xs text-gray-300 mt-1">{companyInfo?.subscription || 'Professional Plan'}</p>
+            {/* Company Logo or Fallback */}
+            {companyInfo?.logo && !logoError ? (
+              <div className="h-16 w-16 rounded-full overflow-hidden mb-2 bg-white border-2 border-[#FF5E14] flex items-center justify-center">
+                <img 
+                  src={getLogoUrl()} 
+                  alt={`${companyInfo.name || 'Company'} Logo`}
+                  className="w-full h-full object-cover" 
+                  onError={() => setLogoError(true)}
+                />
+              </div>
+            ) : (
+              <div className="h-16 w-16 bg-[#FF5E14] rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">
+                {companyInfo?.name?.charAt(0) || 'M'}
+              </div>
+            )}
+            <h2 className="text-xl font-bold text-center truncate max-w-full">
+              {companyInfo?.name || 'MaintenX'}
+            </h2>
+            {/* {companyInfo?.subscriptionStatus && (
+              <p className="text-xs text-gray-300 mt-1">{companyInfo.subscriptionStatus}</p>
+            )} */}
           </div>
         ) : (
-          <div className="h-12 w-12 mx-auto bg-[#FF5E14] rounded-full flex items-center justify-center text-white font-bold">
-            {companyInfo?.name?.charAt(0) || 'M'}
+          <div className="mx-auto">
+            {companyInfo?.logo && !logoError ? (
+              <div className="h-12 w-12 rounded-full overflow-hidden bg-white border-2 border-[#FF5E14] flex items-center justify-center">
+                <img 
+                  src={getLogoUrl()} 
+                  alt={`${companyInfo?.name || 'Company'} Logo`}
+                  className="w-full h-full object-cover" 
+                  onError={() => setLogoError(true)}
+                />
+              </div>
+            ) : (
+              <div className="h-12 w-12 bg-[#FF5E14] rounded-full flex items-center justify-center text-white font-bold">
+                {companyInfo?.name?.charAt(0) || 'M'}
+              </div>
+            )}
           </div>
         )}
         <button 

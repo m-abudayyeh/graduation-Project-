@@ -148,10 +148,10 @@ const CompanyModal = ({ isOpen, onClose, user, company, onUpdate }) => {
     setError(null);
 
     try {
-      // Now including email in the data to be updated
+
       const companyData = {
         name: formData.name,
-        email: formData.email, // Now including email
+        email: formData.email, 
         phoneNumber: formData.phoneNumber,
         address: formData.address,
         website: formData.website
@@ -243,7 +243,7 @@ const CompanyModal = ({ isOpen, onClose, user, company, onUpdate }) => {
                   {previewImage || company?.logo ? (
                     <div className="relative">
                       <img
-                        src={ getImageUrl()}
+                        src={getImageUrl() ||previewImage  }
                         alt="Company Logo"
                         className="w-36 h-36 rounded-full object-cover border-2 border-[#FF5E14]"
                         onError={(e) => {

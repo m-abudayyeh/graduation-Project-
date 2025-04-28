@@ -161,9 +161,11 @@ const MainDashboard = () => {
       {/* Sidebar */}
       <div className={`${sidebarOpen ? 'block' : 'hidden'} md:block`}>
         <Sidebar 
+         user={user} 
+         companyInfo={companyInfo}
           isOpen={sidebarOpen} 
           toggleSidebar={toggleSidebar} 
-          user={user}
+       
         />
       </div>
       
