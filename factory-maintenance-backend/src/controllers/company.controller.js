@@ -7,19 +7,21 @@ const responseHandler = require('../utils/responseHandler');
  */
 exports.getCompanyById = async (req, res, next) => {
   try {
+    console.log('Request params:', req.params);
+    console.log('Request user:', req.user);
     const { id } = req.params;
-    const { companyId, role } = req.user;
+    const { companyId } = req.user;
     
-    // Validate access
-    if (parseInt(id) !== companyId && role !== 'super_admin') {
-      return responseHandler.error(res, 403, 'You do not have permission to access this company');
-    }
-    
-    // Find company
+    // Find company - all users can view their company data
     const company = await Company.findByPk(id);
     
     if (!company) {
       return responseHandler.error(res, 404, 'Company not found');
+    }
+    
+    // Users can only view their own company data, except super_admin
+    if (parseInt(id) !== companyId && req.user.role !== 'super_admin') {
+      return responseHandler.error(res, 403, 'You do not have permission to access this company');
     }
     
     return responseHandler.success(res, 200, 'Company retrieved successfully', company);
@@ -38,21 +40,21 @@ exports.updateCompany = async (req, res, next) => {
     const { companyId, role } = req.user;
     const updates = req.body;
     
+    // Find company first to check if it exists
+    const company = await Company.findByPk(id);
+    
+    if (!company) {
+      return responseHandler.error(res, 404, 'Company not found');
+    }
+    
     // Only admin or super_admin can update company
     if (role !== 'admin' && role !== 'super_admin') {
       return responseHandler.error(res, 403, 'Only admin can update company details');
     }
     
-    // Validate access
+    // Users can only update their own company data, except super_admin
     if (parseInt(id) !== companyId && role !== 'super_admin') {
       return responseHandler.error(res, 403, 'You do not have permission to update this company');
-    }
-    
-    // Find company
-    const company = await Company.findByPk(id);
-    
-    if (!company) {
-      return responseHandler.error(res, 404, 'Company not found');
     }
     
     // Remove fields that shouldn't be updated by regular admin
@@ -62,6 +64,7 @@ exports.updateCompany = async (req, res, next) => {
       delete updates.subscriptionStartDate;
       delete updates.subscriptionEndDate;
       delete updates.stripeCustomerId;
+  
     }
     
     // Update company
@@ -82,12 +85,19 @@ exports.uploadLogo = async (req, res, next) => {
     const { id } = req.params;
     const { companyId, role } = req.user;
     
+    // Find company first to check if it exists
+    const company = await Company.findByPk(id);
+    
+    if (!company) {
+      return responseHandler.error(res, 404, 'Company not found');
+    }
+    
     // Only admin or super_admin can update company logo
     if (role !== 'admin' && role !== 'super_admin') {
       return responseHandler.error(res, 403, 'Only admin can update company logo');
     }
     
-    // Validate access
+    // Users can only update their own company data, except super_admin
     if (parseInt(id) !== companyId && role !== 'super_admin') {
       return responseHandler.error(res, 403, 'You do not have permission to update this company');
     }
@@ -95,13 +105,6 @@ exports.uploadLogo = async (req, res, next) => {
     // Check if file was uploaded
     if (!req.file) {
       return responseHandler.error(res, 400, 'No file uploaded');
-    }
-    
-    // Find company
-    const company = await Company.findByPk(id);
-    
-    if (!company) {
-      return responseHandler.error(res, 404, 'Company not found');
     }
     
     // Update logo

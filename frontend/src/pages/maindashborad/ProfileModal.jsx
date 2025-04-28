@@ -193,7 +193,7 @@ const ProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
                 {previewImage ? (
                   <div className="relative">
                     <img
-                      src={previewImage}
+                      src={`http://localhost:5000/${user.profilePicture}`}
                       alt="Profile"
                       className="w-32 h-32 rounded-full object-cover border-2 border-[#FF5E14]"
                     />

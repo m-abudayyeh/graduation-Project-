@@ -55,9 +55,13 @@ exports.authorizeRoles = (...roles) => {
 
 // Check if the user belongs to the company in the request
 exports.checkCompanyAccess = async (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+
   try {
-    const companyId = req.params.companyId || req.body.companyId;
-    
+    const companyId = req.params.id || req.body.companyId;
+
     // If no companyId specified, move on
     if (!companyId) {
       return next();
@@ -77,9 +81,11 @@ exports.checkCompanyAccess = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.error("Error in checkCompanyAccess middleware:", error);
     next(error);
   }
 };
+
 
 // Verify subscription status
 exports.checkSubscription = async (req, res, next) => {

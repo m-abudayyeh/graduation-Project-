@@ -3,12 +3,18 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ProfileModal from "./ProfileModal";
+import CompanyModal from "./CompanyModal";
 
 const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
   const [workStatus, setWorkStatus] = useState(user?.workStatus || "end_shift");
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showCompanyModal, setShowCompanyModal] = useState(false);
+  const navigate = useNavigate();
 
   const handleWorkStatusChange = async (e) => {
     const newStatus = e.target.value;
+    const previousStatus = workStatus;
     setWorkStatus(newStatus);
 
     try {
@@ -21,12 +27,11 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
       );
       console.log("Work status updated");
     } catch (error) {
+      // Restore previous status if the update fails
+      setWorkStatus(previousStatus);
       console.error("Failed to update work status:", error);
     }
   };
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const navigate = useNavigate();
 
   const toggleProfileMenu = () => {
     setShowProfileMenu(!showProfileMenu);
@@ -49,6 +54,19 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
+    }
+  };
+
+  // Format profile picture URL properly
+  const getProfilePictureUrl = (path) => {
+    if (!path) return null;
+    
+    // Make sure we have a properly formatted path
+    if (path.startsWith('http')) {
+      return path;
+    } else {
+      // Ensure there's only one slash between server and path
+      return `http://localhost:5000${path.startsWith('/') ? '' : '/'}${path}`;
     }
   };
 
@@ -78,7 +96,7 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
 
           <div className="hidden md:block">
             <h1 className="text-xl font-semibold text-[#02245B]">
-              {user?.company.name}{" "}
+              {user?.company?.name || "Company"}{" "}
               <span className="text-[#FF5E14]">Maintenance System</span>
             </h1>
           </div>
@@ -110,9 +128,9 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
           <div className="hidden md:flex items-center space-x-2 border-r border-gray-300 pr-6">
             <span
               className={`h-3 w-3 rounded-full ${
-                user?.workStatus === "on_shift"
+                workStatus === "on_shift"
                   ? "bg-green-500"
-                  : user?.workStatus === "on_call"
+                  : workStatus === "on_call"
                   ? "bg-yellow-500"
                   : "bg-gray-400"
               }`}
@@ -122,6 +140,7 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
               className="text-sm text-gray-600 border-none focus:ring-0 py-0 pl-0 pr-6 bg-transparent"
               value={workStatus}
               onChange={handleWorkStatusChange}
+              disabled={!user?.id}
             >
               <option value="on_shift">On Shift</option>
               <option value="on_call">On Call</option>
@@ -137,18 +156,18 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
             >
               {user?.profilePicture ? (
                 <img
-                  src={user.profilePicture}
-                  alt={user?.firstName}
+                  src={getProfilePictureUrl(user.profilePicture)}
+                  alt={user?.firstName || "User"}
                   className="h-10 w-10 rounded-full object-cover border-2 border-[#FF5E14]"
                 />
               ) : (
                 <div className="h-10 w-10 rounded-full bg-[#02245B] flex items-center justify-center text-white font-bold">
-                  {user?.firstName?.charAt(0)}
+                  {user?.firstName?.charAt(0) || "U"}
                 </div>
               )}
               <div className="hidden md:block">
                 <p className="text-sm font-medium text-gray-800">
-                  {user?.firstName}
+                  {user?.firstName || "User"}
                 </p>
                 <p className="text-xs text-gray-500">{user?.role}</p>
               </div>
@@ -177,9 +196,9 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
                   </p>
                   <p
                     className="px-4 py-1 text-sm font-semibold truncate"
-                    title={user?.email}
+                    title={user?.email || ""}
                   >
-                    {user?.email}
+                    {user?.email || "No email"}
                   </p>
                 </div>
                 <div className="py-1">
@@ -192,12 +211,16 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
                   >
                     Your Profile
                   </button>
-                  <Link
-                    to="/dashboard/company"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                 
+                  <button
+                    onClick={() => {
+                      setShowCompanyModal(true);
+                      setShowProfileMenu(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Company Profile
-                  </Link>
+                  </button>
                 </div>
                 <div className="py-1 border-t border-gray-100">
                   <button
@@ -214,17 +237,32 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
       </div>
 
       {/* Profile Modal */}
-      <ProfileModal
-        isOpen={showProfileModal}
-        onClose={() => setShowProfileModal(false)}
-        user={user}
-        onUpdate={(updatedUser) => {
-          // Handle the updated user data here, e.g. by passing it to a parent component
-          // This callback will be called when the profile is successfully updated
-          console.log("Profile updated:", updatedUser);
-          // You might want to update the user state in a parent component
-        }}
-      />
+      {user && (
+        <ProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          user={user}
+          onUpdate={(updatedUser) => {
+            // Handle the updated user data here, e.g. by passing it to a parent component
+            console.log("Profile updated:", updatedUser);
+            // You might want to update the user state in a parent component
+          }}
+        />
+      )}
+
+      {/* Company Modal - Available for all users to view but only admin can edit */}
+      {user && companyInfo && (
+        <CompanyModal
+          isOpen={showCompanyModal}
+          onClose={() => setShowCompanyModal(false)}
+          company={companyInfo}
+          user={user}
+          onUpdate={(updatedCompany) => {
+            console.log("Company updated:", updatedCompany);
+            // Add logic to update company info in parent component
+          }}
+        />
+      )}
     </header>
   );
 };
