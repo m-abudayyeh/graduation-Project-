@@ -1,4 +1,3 @@
-// migrations/20230419123456-create-location.js
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -40,6 +39,11 @@ module.exports = {
       updatedAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
+      },
+      deletedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
+        defaultValue: null,
       },
     });
   },

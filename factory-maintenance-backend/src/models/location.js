@@ -20,8 +20,18 @@ module.exports = (sequelize, DataTypes) => {
     notes: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: null
     }
-  }, {});
+  }, {
+    // Enable paranoid mode for soft deletes
+    paranoid: true,
+    // Make sure timestamps are enabled
+    timestamps: true
+  });
 
   Location.associate = function(models) {
     // Location belongs to a Company

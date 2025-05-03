@@ -1,6 +1,18 @@
-const { Location, Equipment } = require('../models');
-const responseHandler = require('../utils/responseHandler');
+// const { Location, Equipment } = require('../models');
+// const responseHandler = require('../utils/responseHandler');
+// const { Op } = require('sequelize');
+// const { Location, Equipment } = require('../models');
+// const responseHandler = require('../utils/responseHandler');
+// console.log('المسار الكامل لنموذج Equipment:', require.resolve('../models/equipment'));
+// console.log('جميع النماذج المتاحة:', Object.keys(require('../models')));
+
+
+// استيراد النماذج والمكتبات اللازمة
 const { Op } = require('sequelize');
+const { Location } = require('../models');
+const db = require('../models'); // استيراد كل النماذج وكائن sequelize
+const responseHandler = require('../utils/responseHandler');
+
 
 /**
  * Get all locations for a company
@@ -9,7 +21,7 @@ const { Op } = require('sequelize');
 exports.getAllLocations = async (req, res, next) => {
   try {
     const { companyId } = req.user;
-    const { page = 1, limit = 10, search } = req.query;
+    const { page = 2, limit = 5, search, includeDeleted } = req.query;
     
     const offset = (page - 1) * limit;
     
@@ -29,7 +41,9 @@ exports.getAllLocations = async (req, res, next) => {
       where: whereConditions,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['name', 'ASC']]
+      order: [['name', 'ASC']],
+      // Include deleted records if specified
+      paranoid: includeDeleted === 'true' ? false : true
     });
     
     return responseHandler.paginate(
@@ -51,10 +65,13 @@ exports.getLocationById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { companyId } = req.user;
+    const { includeDeleted } = req.query;
     
     // Find location
     const location = await Location.findOne({
-      where: { id, companyId }
+      where: { id, companyId },
+      // Include deleted records if specified
+      paranoid: includeDeleted === 'true' ? false : true
     });
     
     if (!location) {
@@ -122,6 +139,7 @@ exports.updateLocation = async (req, res, next) => {
     
     // Remove fields that shouldn't be updated
     delete updates.companyId;
+    delete updates.deletedAt; // Prevent manual update of deletedAt
     
     // Update location
     await location.update(updates);
@@ -131,6 +149,61 @@ exports.updateLocation = async (req, res, next) => {
     next(error);
   }
 };
+
+// /**
+//  * Delete location
+//  * @route DELETE /api/locations/:id
+//  */
+// exports.deleteLocation = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const { companyId, role } = req.user;
+    
+//     // Only admin can delete locations
+//     if (role !== 'admin') {
+//       return responseHandler.error(res, 403, 'Only admin can delete locations');
+//     }
+    
+//     // Find location
+//     const location = await Location.findOne({
+//       where: { id, companyId }
+//     });
+    
+//     if (!location) {
+//       return responseHandler.error(res, 404, 'Location not found');
+//     }
+    
+//     // Check if location has equipment or work orders
+//     // const equipmentCount = await db.Equipments.count({
+//     //   where: { locationId: id }
+//     // });
+
+//     const [result] = await sequelize.query(
+//       'SELECT COUNT(*) as count FROM "Equipments" WHERE "locationId" = :locationId',
+//       {
+//         replacements: { locationId: id },
+//         type: sequelize.QueryTypes.SELECT
+//       }
+//     );
+    
+    
+//     if (equipmentCount > 0) {
+//       return responseHandler.error(
+//         res, 
+//         400, 
+//         'Cannot delete location because it has equipment associated with it'
+//       );
+//     }
+    
+//     // Delete location (now a soft delete due to paranoid mode)
+//     await location.destroy();
+    
+//     return responseHandler.success(res, 200, 'Location deleted successfully');
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 
 /**
  * Delete location
@@ -155,12 +228,16 @@ exports.deleteLocation = async (req, res, next) => {
       return responseHandler.error(res, 404, 'Location not found');
     }
     
-    // Check if location has equipment or work orders
-    const equipmentCount = await Equipment.count({
-      where: { locationId: id }
-    });
+    // استخدام استعلام SQL مباشر للتحقق من وجود معدات مرتبطة
+    const [result] = await db.sequelize.query(
+      'SELECT COUNT(*) as count FROM "Equipments" WHERE "locationId" = :locationId',
+      {
+        replacements: { locationId: id },
+        type: db.sequelize.QueryTypes.SELECT
+      }
+    );
     
-    if (equipmentCount > 0) {
+    if (parseInt(result.count) > 0) {
       return responseHandler.error(
         res, 
         400, 
@@ -168,15 +245,141 @@ exports.deleteLocation = async (req, res, next) => {
       );
     }
     
-    // Delete location
+    // Delete location (now a soft delete due to paranoid mode)
     await location.destroy();
     
     return responseHandler.success(res, 200, 'Location deleted successfully');
+  } catch (error) {
+    console.error('Error deleting location:', error);
+    next(error);
+  }
+};
+
+/**
+ * Restore a soft-deleted location
+ * @route POST /api/locations/:id/restore
+ */
+exports.restoreLocation = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { companyId, role } = req.user;
+    
+    // Only admin can restore locations
+    if (role !== 'admin') {
+      return responseHandler.error(res, 403, 'Only admin can restore locations');
+    }
+    
+    // Find the soft-deleted location
+    const location = await Location.findOne({
+      where: { id, companyId },
+      paranoid: false // Include soft-deleted records
+    });
+    
+    if (!location) {
+      return responseHandler.error(res, 404, 'Location not found');
+    }
+    
+    if (!location.deletedAt) {
+      return responseHandler.error(res, 400, 'Location is not deleted');
+    }
+    
+    // Restore the location
+    await location.restore();
+    
+    return responseHandler.success(res, 200, 'Location restored successfully', location);
+  } catch (error) {
+    console.error('Error restoring location:', error);
+    next(error);
+  }
+};
+/**
+ * Restore a soft-deleted location
+ * @route POST /api/locations/:id/restore
+ */
+exports.restoreLocation = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { companyId, role } = req.user;
+    
+    // Only admin can restore locations
+    if (role !== 'admin') {
+      return responseHandler.error(res, 403, 'Only admin can restore locations');
+    }
+    
+    // Find the soft-deleted location
+    const location = await Location.findOne({
+      where: { id, companyId },
+      paranoid: false // Include soft-deleted records
+    });
+    
+    if (!location) {
+      return responseHandler.error(res, 404, 'Location not found');
+    }
+    
+    if (!location.deletedAt) {
+      return responseHandler.error(res, 400, 'Location is not deleted');
+    }
+    
+    // Restore the location
+    await location.restore();
+    
+    return responseHandler.success(res, 200, 'Location restored successfully', location);
   } catch (error) {
     next(error);
   }
 };
 
+
+/**
+ * Permanently delete location (hard delete)
+ * @route DELETE /api/locations/:id/permanent
+ */
+exports.permanentlyDeleteLocation = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { companyId, role } = req.user;
+    
+    // Only admin can permanently delete locations
+    if (role !== 'admin') {
+      return responseHandler.error(res, 403, 'Only admin can permanently delete locations');
+    }
+    
+    // Find location (including soft-deleted ones)
+    const location = await Location.findOne({
+      where: { id, companyId },
+      paranoid: false // Include soft-deleted records
+    });
+    
+    if (!location) {
+      return responseHandler.error(res, 404, 'Location not found');
+    }
+    
+    // Use direct SQL query to check for associated equipment (matching the working function)
+    const [result] = await db.sequelize.query(
+      'SELECT COUNT(*) as count FROM "Equipments" WHERE "locationId" = :locationId',
+      {
+        replacements: { locationId: id },
+        type: db.sequelize.QueryTypes.SELECT
+      }
+    );
+    
+    if (parseInt(result.count) > 0) {
+      return responseHandler.error(
+        res, 
+        400, 
+        'Cannot delete location because it has equipment associated with it'
+      );
+    }
+    
+    // Permanently delete location
+    await location.destroy({ force: true });
+    
+    return responseHandler.success(res, 200, 'Location permanently deleted');
+  } catch (error) {
+    console.error('Error permanently deleting location:', error);
+    next(error);
+  }
+};
 /**
  * Upload location image
  * @route PUT /api/locations/:id/image

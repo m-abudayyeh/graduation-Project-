@@ -28,11 +28,25 @@ router.put(
   locationController.updateLocation
 );
 
-// Delete location (admin only)
+// Delete location (admin only) - now soft delete
 router.delete(
   '/:id',
   authorizeRoles('admin'),
   locationController.deleteLocation
+);
+
+// Restore a soft-deleted location (admin only)
+router.post(
+  '/:id/restore',
+  authorizeRoles('admin'),
+  locationController.restoreLocation
+);
+
+// Permanently delete location (admin only)
+router.delete(
+  '/:id/permanent',
+  authorizeRoles('admin'),
+  locationController.permanentlyDeleteLocation
 );
 
 // Upload location image
