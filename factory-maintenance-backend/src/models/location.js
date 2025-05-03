@@ -46,11 +46,11 @@ module.exports = (sequelize, DataTypes) => {
       as: 'equipment'
     });
 
-    // Location has many StoreParts
-    Location.hasMany(models.StorePart, {
-      foreignKey: 'locationId',
-      as: 'storeParts'
-    });
+    // // Location has many StoreParts
+    // Location.hasMany(models.StorePart, {
+    //   foreignKey: 'locationId',
+    //   as: 'storeParts'
+    // });
 
     // Location has many WorkOrders
     Location.hasMany(models.WorkOrder, {

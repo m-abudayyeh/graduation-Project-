@@ -34,6 +34,13 @@ router.put(
   storePartController.updatePart
 );
 
+// استرجاع قطعة غيار محذوفة
+router.post(
+  '/:id/restore',
+  authorizeRoles('admin'),
+  storePartController.restorePart
+);
+
 // Delete store part (admin only)
 router.delete(
   '/:id',

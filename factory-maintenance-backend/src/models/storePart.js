@@ -25,6 +25,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -37,6 +41,11 @@ module.exports = (sequelize, DataTypes) => {
     notes: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   }, {});
 
@@ -46,13 +55,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'companyId',
       as: 'company'
     });
-
-    // StorePart belongs to a Location
-    StorePart.belongsTo(models.Location, {
-      foreignKey: 'locationId',
-      as: 'location'
-    });
-
+    
     // StorePart can be associated with many WorkOrders through a join table
     StorePart.belongsToMany(models.WorkOrder, {
       through: 'WorkOrderParts',

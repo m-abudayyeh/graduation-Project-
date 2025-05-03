@@ -1,5 +1,5 @@
-// migrations/20230419123456-create-store-part.js
 'use strict';
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('StoreParts', {
@@ -29,6 +29,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      location: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       quantity: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -42,6 +46,11 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      isDeleted: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       companyId: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -49,14 +58,8 @@ module.exports = {
           model: 'Companies',
           key: 'id',
         },
-      },
-      locationId: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        references: {
-          model: 'Locations',
-          key: 'id',
-        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -68,7 +71,6 @@ module.exports = {
       },
     });
 
-    // Creating the join table for StoreParts and WorkOrders
     await queryInterface.createTable('WorkOrderParts', {
       id: {
         type: Sequelize.INTEGER,
@@ -83,6 +85,8 @@ module.exports = {
           model: 'StoreParts',
           key: 'id',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       workOrderId: {
         type: Sequelize.INTEGER,
@@ -91,6 +95,8 @@ module.exports = {
           model: 'WorkOrders',
           key: 'id',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -104,7 +110,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    // Dropping the tables if the migration is rolled back
     await queryInterface.dropTable('WorkOrderParts');
     await queryInterface.dropTable('StoreParts');
   },

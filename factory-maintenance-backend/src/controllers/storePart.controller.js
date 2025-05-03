@@ -1,4 +1,4 @@
-const { StorePart, Location, WorkOrderParts } = require('../models');
+const { StorePart, WorkOrderParts } = require('../models');
 const responseHandler = require('../utils/responseHandler');
 const { Op, Sequelize } = require('sequelize');
 
@@ -9,16 +9,25 @@ const { Op, Sequelize } = require('sequelize');
 exports.getAllParts = async (req, res, next) => {
   try {
     const { companyId } = req.user;
-    const { page = 1, limit = 10, search, locationId, category } = req.query;
+    const { page = 1, limit = 10, search, location, category, includeDeleted } = req.query;
     
     const offset = (page - 1) * limit;
     
     // Build query conditions
     const whereConditions = { companyId };
     
+    // Add isDeleted condition based on includeDeleted parameter
+    if (includeDeleted === 'true') {
+      // If includeDeleted is true, we don't add any isDeleted condition
+      // This will return both deleted and non-deleted items
+    } else {
+      // If includeDeleted is false or not provided, only show non-deleted items
+      whereConditions.isDeleted = false;
+    }
+    
     // Add location filter if provided
-    if (locationId) {
-      whereConditions.locationId = locationId;
+    if (location) {
+      whereConditions.location = location;
     }
     
     // Add category filter if provided
@@ -35,10 +44,9 @@ exports.getAllParts = async (req, res, next) => {
       ];
     }
     
-    // Get store parts with pagination and include location
+    // Get store parts with pagination
     const { count, rows } = await StorePart.findAndCountAll({
       where: whereConditions,
-      include: [{ model: Location, as: 'location' }],
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['name', 'ASC']]
@@ -64,10 +72,12 @@ exports.getPartById = async (req, res, next) => {
     const { id } = req.params;
     const { companyId } = req.user;
     
-    // Find store part
+    // Find store part (including deleted ones)
     const part = await StorePart.findOne({
-      where: { id, companyId },
-      include: [{ model: Location, as: 'location' }]
+      where: { 
+        id, 
+        companyId
+      }
     });
     
     if (!part) {
@@ -95,19 +105,8 @@ exports.createPart = async (req, res, next) => {
     
     const { 
       name, partNumber, category, description, 
-      quantity, locationId, notes 
+      quantity, location, notes 
     } = req.body;
-    
-    // Validate location belongs to company
-    if (locationId) {
-      const location = await Location.findOne({
-        where: { id: locationId, companyId }
-      });
-      
-      if (!location) {
-        return responseHandler.error(res, 404, 'Location not found');
-      }
-    }
     
     // Create store part
     const part = await StorePart.create({
@@ -116,17 +115,13 @@ exports.createPart = async (req, res, next) => {
       category,
       description,
       quantity: parseInt(quantity) || 0,
-      locationId,
+      location,
       notes,
-      companyId
+      companyId,
+      isDeleted: false
     });
     
-    // Fetch created part with location
-    const createdPart = await StorePart.findByPk(part.id, {
-      include: [{ model: Location, as: 'location' }]
-    });
-    
-    return responseHandler.success(res, 201, 'Store part created successfully', createdPart);
+    return responseHandler.success(res, 201, 'Store part created successfully', part);
   } catch (error) {
     next(error);
   }
@@ -149,22 +144,15 @@ exports.updatePart = async (req, res, next) => {
     
     // Find store part
     const part = await StorePart.findOne({
-      where: { id, companyId }
+      where: { 
+        id, 
+        companyId,
+        isDeleted: false
+      }
     });
     
     if (!part) {
       return responseHandler.error(res, 404, 'Store part not found');
-    }
-    
-    // Validate location belongs to company if provided
-    if (updates.locationId) {
-      const location = await Location.findOne({
-        where: { id: updates.locationId, companyId }
-      });
-      
-      if (!location) {
-        return responseHandler.error(res, 404, 'Location not found');
-      }
     }
     
     // Parse quantity as integer if provided
@@ -174,23 +162,19 @@ exports.updatePart = async (req, res, next) => {
     
     // Remove fields that shouldn't be updated
     delete updates.companyId;
+    delete updates.isDeleted;
     
     // Update store part
     await part.update(updates);
     
-    // Fetch updated part with location
-    const updatedPart = await StorePart.findByPk(part.id, {
-      include: [{ model: Location, as: 'location' }]
-    });
-    
-    return responseHandler.success(res, 200, 'Store part updated successfully', updatedPart);
+    return responseHandler.success(res, 200, 'Store part updated successfully', part);
   } catch (error) {
     next(error);
   }
 };
 
 /**
- * Delete store part
+ * Delete store part (soft delete)
  * @route DELETE /api/store/:id
  */
 exports.deletePart = async (req, res, next) => {
@@ -205,31 +189,85 @@ exports.deletePart = async (req, res, next) => {
     
     // Find store part
     const part = await StorePart.findOne({
-      where: { id, companyId }
+      where: { 
+        id, 
+        companyId,
+        isDeleted: false
+      }
     });
     
     if (!part) {
       return responseHandler.error(res, 404, 'Store part not found');
     }
     
-    // Check if part is used in any work orders
-    const usageCount = await WorkOrderParts.count({
-      where: { storePartId: id }
-    });
+    try {
+      // Try to check if part is used in work orders
+      const db = require('../models');
+      if (db.WorkOrderParts) {
+        const usageCount = await db.WorkOrderParts.count({
+          where: { storePartId: id }
+        });
+        
+        if (usageCount > 0) {
+          return responseHandler.error(
+            res, 
+            400, 
+            'Cannot delete part because it is used in work orders'
+          );
+        }
+      }
+      
+      // Soft delete the store part
+      await part.update({ isDeleted: true });
+      
+      return responseHandler.success(res, 200, 'Store part deleted successfully');
+    } catch (innerError) {
+      console.error("Error checking part usage:", innerError);
+      
+      // Continue with delete even if the check fails
+      await part.update({ isDeleted: true });
+      
+      return responseHandler.success(res, 200, 'Store part deleted successfully (without usage check)');
+    }
+  } catch (error) {
+    console.error("General error in delete function:", error);
+    next(error);
+  }
+};
+
+/**
+ * Restore deleted store part
+ * @route POST /api/store/:id/restore
+ */
+exports.restorePart = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { companyId, role } = req.user;
     
-    if (usageCount > 0) {
-      return responseHandler.error(
-        res, 
-        400, 
-        'Cannot delete part because it is used in work orders'
-      );
+    // Only admin can restore store parts
+    if (role !== 'admin') {
+      return responseHandler.error(res, 403, 'Only admin can restore store parts');
     }
     
-    // Delete store part
-    await part.destroy();
+    // Find deleted store part
+    const part = await StorePart.findOne({
+      where: { 
+        id, 
+        companyId,
+        isDeleted: true
+      }
+    });
     
-    return responseHandler.success(res, 200, 'Store part deleted successfully');
+    if (!part) {
+      return responseHandler.error(res, 404, 'Deleted store part not found');
+    }
+    
+    // Restore store part
+    await part.update({ isDeleted: false });
+    
+    return responseHandler.success(res, 200, 'Store part restored successfully', part);
   } catch (error) {
+    console.error("Error restoring store part:", error);
     next(error);
   }
 };
@@ -255,7 +293,11 @@ exports.uploadImage = async (req, res, next) => {
     
     // Find store part
     const part = await StorePart.findOne({
-      where: { id, companyId }
+      where: { 
+        id, 
+        companyId,
+        isDeleted: false
+      }
     });
     
     if (!part) {
@@ -293,7 +335,11 @@ exports.uploadFile = async (req, res, next) => {
     
     // Find store part
     const part = await StorePart.findOne({
-      where: { id, companyId }
+      where: { 
+        id, 
+        companyId,
+        isDeleted: false
+      }
     });
     
     if (!part) {
@@ -327,7 +373,11 @@ exports.updateQuantity = async (req, res, next) => {
     
     // Find store part
     const part = await StorePart.findOne({
-      where: { id, companyId }
+      where: { 
+        id, 
+        companyId,
+        isDeleted: false
+      }
     });
     
     if (!part) {
@@ -369,6 +419,7 @@ exports.getCategories = async (req, res, next) => {
       attributes: [[Sequelize.fn('DISTINCT', Sequelize.col('category')), 'category']],
       where: { 
         companyId,
+        isDeleted: false,
         category: { [Op.ne]: null }
       },
       raw: true
@@ -398,9 +449,9 @@ exports.getLowStockParts = async (req, res, next) => {
     const lowStockParts = await StorePart.findAll({
       where: { 
         companyId,
+        isDeleted: false,
         quantity: { [Op.lt]: minQuantity }
       },
-      include: [{ model: Location, as: 'location' }],
       order: [['quantity', 'ASC']]
     });
     
