@@ -25,6 +25,7 @@ const Locations = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [includeDeleted, setIncludeDeleted] = useState(false);
   const [confirmation, setConfirmation] = useState(null);
+  const [filtersVisible, setFiltersVisible] = useState(false);
   
   // Fetch locations
   const fetchLocations = async () => {
@@ -314,6 +315,14 @@ const Locations = () => {
     setCurrentPage(page);
   };
   
+  // Toggle filters visibility (for mobile)
+  const toggleFiltersVisibility = () => {
+    setFiltersVisible(!filtersVisible);
+  };
+  
+  // Check if any filter is active
+  const hasActiveFilters = includeDeleted;
+  
   useEffect(() => {
     fetchLocations();
   }, [currentPage, limit, searchTerm, includeDeleted]);
@@ -329,17 +338,19 @@ const Locations = () => {
   }, [success]);
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container mx-auto px-4 py-8 max-w-full">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold text-[#02245B]">Locations Management</h1>
         <button 
           onClick={() => { setShowForm(true); setSelectedLocation(null); setShowDetails(false); }}
-          className="bg-[#FF5E14] hover:bg-[#e05413] text-white px-4 py-2 rounded-md"
+          className="bg-[#FF5E14] hover:bg-[#e05413] text-white px-3 sm:px-4 py-2 rounded-md text-sm sm:text-base"
         >
           Add New Location
         </button>
       </div>
       
+      {/* Alerts */}
       {error && (
         <Alert 
           type="error" 
@@ -356,39 +367,72 @@ const Locations = () => {
         />
       )}
       
-      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <SearchBar onSearch={handleSearch} />
+      {/* Search and Filters Section */}
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          <div className="w-full sm:w-auto">
+            <SearchBar onSearch={handleSearch} />
+          </div>
+          
+          <button
+            onClick={toggleFiltersVisibility}
+            className="flex items-center px-3 py-2 bg-[#02245B] text-white rounded-md sm:hidden"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filters {hasActiveFilters && <span className="ml-1 bg-[#FF5E14] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">!</span>}
+          </button>
+        </div>
         
-        <div className="flex items-center">
-          <label className="inline-flex items-center cursor-pointer">
-            <input 
-              type="checkbox" 
-              checked={includeDeleted} 
-              onChange={toggleIncludeDeleted}
-              className="sr-only peer"
-            />
-            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#02245B]"></div>
-            <span className="ml-3 text-sm font-medium text-gray-700"> Deleted Location</span>
-          </label>
+        {/* Filters - Always visible on desktop, toggleable on mobile */}
+        <div className={`${filtersVisible || window.innerWidth >= 640 ? 'block' : 'hidden'} sm:block bg-white p-4 rounded-lg shadow-sm mb-4 transition-all duration-300`}>
+          <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4">
+            <div className="w-full sm:w-auto flex items-center mt-2 sm:mt-0">
+              <label className="inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={includeDeleted} 
+                  onChange={toggleIncludeDeleted}
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#02245B]"></div>
+                <div className="ml-3 text-sm font-medium text-gray-700 flex items-center pt-[2px]">Deleted Locations</div>
+              </label>
+            </div>
+            
+            {hasActiveFilters && (
+              <button
+                onClick={() => {
+                  setIncludeDeleted(false);
+                }}
+                className="text-[#FF5E14] text-sm font-medium hover:underline mt-2 sm:mt-0 ml-auto"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
         </div>
       </div>
       
+      {/* Main Content */}
       {loading && !showForm && !showDetails ? (
         <div className="flex justify-center items-center h-64">
           <Loading message="Loading locations..." />
-          
         </div>
       ) : (
         <>
           {showForm ? (
-            <LocationForm 
-              location={selectedLocation} 
-              onSubmit={selectedLocation ? updateLocation : createLocation}
-              onClose={handleClose}
-              onUploadImage={uploadImage}
-              setError={setError}
-              setSuccess={setSuccess}
-            />
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto">
+              <LocationForm 
+                location={selectedLocation} 
+                onSubmit={selectedLocation ? updateLocation : createLocation}
+                onClose={handleClose}
+                onUploadImage={uploadImage}
+                setError={setError}
+                setSuccess={setSuccess}
+              />
+            </div>
           ) : (
             <>
               {locations.length === 0 && !loading ? (
@@ -403,20 +447,23 @@ const Locations = () => {
                 </div>
               ) : (
                 <>
-                  <LocationList 
-                    locations={locations} 
-                    onView={viewLocationDetails}
-                    onEdit={editLocation}
-                    onDelete={deleteLocation}
-                    onRestore={restoreLocation}
-                  />
-                  
-                  <Pagination 
-                    currentPage={currentPage}
-                    totalCount={totalCount}
-                    pageSize={limit}
-                    onPageChange={handlePageChange}
-                  />
+                  <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+                    <LocationList 
+                      locations={locations} 
+                      onView={viewLocationDetails}
+                      onEdit={editLocation}
+                      onDelete={deleteLocation}
+                      onRestore={restoreLocation}
+                    />
+                  </div>
+                  <div className="mt-6">
+                    <Pagination 
+                      currentPage={currentPage}
+                      totalCount={totalCount}
+                      pageSize={limit}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
                 </>
               )}
             </>
@@ -424,25 +471,27 @@ const Locations = () => {
         </>
       )}
       
-      {/* Render the LocationDetailsModal when showDetails is true */}
+      {/* Location Details Modal */}
       {showDetails && selectedLocation && (
-        <LocationDetailsModal
-          location={selectedLocation}
-          onClose={handleClose}
-          onEdit={() => editLocation(selectedLocation)}
-          onDelete={deleteLocation}
-          onPermanentDelete={permanentlyDeleteLocation}
-          onRestore={restoreLocation}
-          onUploadImage={uploadImage}
-          setError={setError}
-          setSuccess={setSuccess}
-        />
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto">
+          <LocationDetailsModal
+            location={selectedLocation}
+            onClose={handleClose}
+            onEdit={() => editLocation(selectedLocation)}
+            onDelete={deleteLocation}
+            onPermanentDelete={permanentlyDeleteLocation}
+            onRestore={restoreLocation}
+            onUploadImage={uploadImage}
+            setError={setError}
+            setSuccess={setSuccess}
+          />
+        </div>
       )}
       
       {/* Custom Confirmation Dialog */}
       {confirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-xl max-w-md w-full">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Confirmation</h3>
             <p className="mb-6 text-gray-600">{confirmation.message}</p>
             <div className="flex justify-end space-x-3">

@@ -34,6 +34,7 @@ const Machines = () => {
   const [statuses, setStatuses] = useState([]);
   const [maintenanceDue, setMaintenanceDue] = useState([]);
   const [showMaintenanceDue, setShowMaintenanceDue] = useState(false);
+  const [filtersVisible, setFiltersVisible] = useState(false);
   
   // Fetch equipment
   const fetchEquipment = async () => {
@@ -459,6 +460,14 @@ const Machines = () => {
     setCurrentPage(page);
   };
   
+  // Toggle filters visibility (for mobile)
+  const toggleFiltersVisibility = () => {
+    setFiltersVisible(!filtersVisible);
+  };
+  
+  // Check if any filter is active
+  const hasActiveFilters = categoryFilter || locationFilter || statusFilter || showDeleted;
+  
   useEffect(() => {
     fetchEquipment();
     fetchCategories();
@@ -478,28 +487,32 @@ const Machines = () => {
   }, [success]);
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container mx-auto px-4 py-8 max-w-full">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold text-[#02245B]">Equipment Management</h1>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button 
             onClick={() => setShowMaintenanceDue(!showMaintenanceDue)}
-            className={`${showMaintenanceDue ? 'bg-[#02245B]' : 'bg-[#5F656F]'} hover:opacity-90 text-white px-4 py-2 rounded-md flex items-center`}
+            className={`${showMaintenanceDue ? 'bg-[#02245B]' : 'bg-[#5F656F]'} hover:opacity-90 text-white px-3 sm:px-4 py-2 rounded-md flex items-center text-sm sm:text-base`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Maintenance Due {maintenanceDue.length > 0 ? `(${maintenanceDue.length})` : ''}
+            <span className="whitespace-nowrap">
+              Maintenance {maintenanceDue.length > 0 ? `(${maintenanceDue.length})` : ''}
+            </span>
           </button>
           <button 
             onClick={() => { setShowForm(true); setSelectedEquipment(null); setShowDetails(false); }}
-            className="bg-[#FF5E14] hover:bg-[#e05413] text-white px-4 py-2 rounded-md"
+            className="bg-[#FF5E14] hover:bg-[#e05413] text-white px-3 sm:px-4 py-2 rounded-md text-sm sm:text-base"
           >
-            Add New Equipment
+            Add Equipment
           </button>
         </div>
       </div>
       
+      {/* Alerts */}
       {error && (
         <Alert 
           type="error" 
@@ -516,72 +529,119 @@ const Machines = () => {
         />
       )}
       
+      {/* Maintenance Due Section */}
       {showMaintenanceDue && maintenanceDue.length > 0 && (
-        <MaintenanceDue 
-          equipment={maintenanceDue}
-          onView={viewEquipmentDetails}
-          onUpdateDates={updateMaintenanceDates}
-          setSuccess={setSuccess}
-          setError={setError}
-        />
+        <div className="mb-6 overflow-x-auto">
+          <MaintenanceDue 
+            equipment={maintenanceDue}
+            onView={viewEquipmentDetails}
+            onUpdateDates={updateMaintenanceDates}
+            setSuccess={setSuccess}
+            setError={setError}
+          />
+        </div>
       )}
       
-      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <SearchBar onSearch={handleSearch} placeholder="Search equipment..." />
+      {/* Search and Filters Section */}
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          <div className="w-full sm:w-auto">
+            <SearchBar onSearch={handleSearch} placeholder="Search equipment..." />
+          </div>
+          
+          <button
+            onClick={toggleFiltersVisibility}
+            className="flex items-center px-3 py-2 bg-[#02245B] text-white rounded-md sm:hidden"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Filters {hasActiveFilters && <span className="ml-1 bg-[#FF5E14] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">!</span>}
+          </button>
+        </div>
         
-        <div className="flex flex-wrap items-center gap-4">
-          {categories.length > 0 && (
-            <select
-              value={categoryFilter}
-              onChange={(e) => handleCategoryFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#02245B]"
-            >
-              <option value="">All Categories</option>
-              {categories.map((category, index) => (
-                <option key={index} value={category}>{category}</option>
-              ))}
-            </select>
-          )}
-          
-          {locations.length > 0 && (
-            <select
-              value={locationFilter}
-              onChange={(e) => handleLocationFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#02245B]"
-            >
-              <option value="">All Locations</option>
-              {locations.map((location) => (
-                <option key={location.id} value={location.id}>{location.name}</option>
-              ))}
-            </select>
-          )}
-          
-          {statuses.length > 0 && (
-            <select
-              value={statusFilter}
-              onChange={(e) => handleStatusFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#02245B]"
-            >
-              <option value="">All Statuses</option>
-              {statuses.map((status, index) => (
-                <option key={index} value={status}>{status.replace('_', ' ')}</option>
-              ))}
-            </select>
-          )}
-          
-          <label className="inline-flex items-center cursor-pointer">
-            <input 
-              type="checkbox" 
-              checked={showDeleted} 
-              onChange={toggleShowDeleted}
-              className="sr-only peer"
-            />
-            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#02245B]"></div>
-            <span className="ml-3 text-sm font-medium text-gray-700">Show Deleted</span>
-          </label>
+        {/* Filters - Always visible on desktop, toggleable on mobile */}
+        <div className={`${filtersVisible || window.innerWidth >= 640 ? 'block' : 'hidden'} sm:block bg-white p-4 rounded-lg shadow-sm mb-4 transition-all duration-300`}>
+          <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4">
+            {categories.length > 0 && (
+              <div className="w-full sm:w-auto">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => handleCategoryFilter(e.target.value)}
+                  className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#02245B]"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((category, index) => (
+                    <option key={index} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            
+            {locations.length > 0 && (
+              <div className="w-full sm:w-auto">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <select
+                  value={locationFilter}
+                  onChange={(e) => handleLocationFilter(e.target.value)}
+                  className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#02245B]"
+                >
+                  <option value="">All Locations</option>
+                  {locations.map((location) => (
+                    <option key={location.id} value={location.id}>{location.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            
+            {statuses.length > 0 && (
+              <div className="w-full sm:w-auto">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => handleStatusFilter(e.target.value)}
+                  className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#02245B]"
+                >
+                  <option value="">All Statuses</option>
+                  {statuses.map((status, index) => (
+                    <option key={index} value={status}>{status.replace('_', ' ')}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            
+            <div className="w-full sm:w-auto flex items-center mt-2 sm:mt-0 pt-[25px]">
+              <label className="inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={showDeleted} 
+                  onChange={toggleShowDeleted}
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#02245B]"></div>
+<div className="ml-3 text-sm font-medium text-gray-700 flex">Show Deleted</div>
+              </label>
+            </div>
+            
+            {hasActiveFilters && (
+              <button
+                onClick={() => {
+                  setCategoryFilter('');
+                  setLocationFilter('');
+                  setStatusFilter('');
+                  setShowDeleted(false);
+                }}
+                className="text-[#FF5E14] text-sm font-medium hover:underline mt-2 sm:mt-0 ml-auto"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
         </div>
       </div>
       
+      {/* Main Content */}
       {loading && !showForm && !showDetails ? (
         <div className="flex justify-center items-center h-64">
           <Loading message="Loading equipment..." />
@@ -589,33 +649,37 @@ const Machines = () => {
       ) : (
         <>
           {showForm ? (
-            <EquipmentForm 
-              equipment={selectedEquipment} 
-              onSubmit={selectedEquipment ? updateEquipment : createEquipment}
-              onClose={handleClose}
-              onUploadImage={uploadImage}
-              onUploadFile={uploadFile}
-              categories={categories}
-              locations={locations}
-              statuses={statuses}
-              setError={setError}
-              setSuccess={setSuccess}
-            />
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto">
+              <EquipmentForm 
+                equipment={selectedEquipment} 
+                onSubmit={selectedEquipment ? updateEquipment : createEquipment}
+                onClose={handleClose}
+                onUploadImage={uploadImage}
+                onUploadFile={uploadFile}
+                categories={categories}
+                locations={locations}
+                statuses={statuses}
+                setError={setError}
+                setSuccess={setSuccess}
+              />
+            </div>
           ) : showDetails && selectedEquipment ? (
-            <EquipmentDetailsModal
-              equipment={selectedEquipment}
-              onClose={handleClose}
-              onEdit={() => editEquipment(selectedEquipment)}
-              onDelete={deleteEquipment}
-              onRestore={restoreEquipment}
-              onUpdateStatus={updateStatus}
-              onUpdateMaintenanceDates={updateMaintenanceDates}
-              onUploadImage={uploadImage}
-              onUploadFile={uploadFile}
-              statuses={statuses}
-              setError={setError}
-              setSuccess={setSuccess}
-            />
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto">
+              <EquipmentDetailsModal
+                equipment={selectedEquipment}
+                onClose={handleClose}
+                onEdit={() => editEquipment(selectedEquipment)}
+                onDelete={deleteEquipment}
+                onRestore={restoreEquipment}
+                onUpdateStatus={updateStatus}
+                onUpdateMaintenanceDates={updateMaintenanceDates}
+                onUploadImage={uploadImage}
+                onUploadFile={uploadFile}
+                statuses={statuses}
+                setError={setError}
+                setSuccess={setSuccess}
+              />
+            </div>
           ) : (
             <>
               {equipment.length === 0 && !loading ? (
@@ -630,20 +694,24 @@ const Machines = () => {
                 </div>
               ) : (
                 <>
-                  <EquipmentList 
-                    equipment={equipment} 
-                    onView={viewEquipmentDetails}
-                    onEdit={editEquipment}
-                    onDelete={deleteEquipment}
-                    onRestore={restoreEquipment}
-                    onUpdateStatus={updateStatus}
-                  />
-                  <Pagination 
-                    currentPage={currentPage}
-                    totalCount={totalCount}
-                    pageSize={limit}
-                    onPageChange={handlePageChange}
-                  />
+                  <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+                    <EquipmentList 
+                      equipment={equipment} 
+                      onView={viewEquipmentDetails}
+                      onEdit={editEquipment}
+                      onDelete={deleteEquipment}
+                      onRestore={restoreEquipment}
+                      onUpdateStatus={updateStatus}
+                    />
+                  </div>
+                  <div className="mt-6">
+                    <Pagination 
+                      currentPage={currentPage}
+                      totalCount={totalCount}
+                      pageSize={limit}
+                      onPageChange={handlePageChange}
+                    />
+                  </div>
                 </>
               )}
             </>
@@ -653,8 +721,8 @@ const Machines = () => {
       
       {/* Custom Confirmation Dialog */}
       {confirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-xl max-w-md w-full">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Confirmation</h3>
             <p className="mb-6 text-gray-600">{confirmation.message}</p>
             <div className="flex justify-end space-x-3">
