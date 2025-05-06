@@ -45,6 +45,36 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      status: {
+        type: Sequelize.ENUM('running', 'maintenance', 'out_of_service', 'standby'),
+        allowNull: false,
+        defaultValue: 'running',
+      },
+      purchaseDate: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      installationDate: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      warranty: {
+        type: Sequelize.JSON,
+        allowNull: true,
+      },
+      lastMaintenanceDate: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      nextMaintenanceDate: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      isDeleted: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       companyId: {
         type: Sequelize.INTEGER,
         allowNull: true,

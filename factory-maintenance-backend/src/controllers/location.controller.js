@@ -21,8 +21,8 @@ const responseHandler = require('../utils/responseHandler');
 exports.getAllLocations = async (req, res, next) => {
   try {
     const { companyId } = req.user;
-    const { page = 2, limit = 5, search, includeDeleted } = req.query;
-    
+    const { page =1 , limit = 5, search, includeDeleted } = req.query;
+  
     const offset = (page - 1) * limit;
     
     // Build query conditions

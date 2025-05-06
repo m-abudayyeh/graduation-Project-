@@ -1,6 +1,7 @@
 const { Equipment, Location, WorkOrder, PreventiveMaintenance } = require('../models');
 const responseHandler = require('../utils/responseHandler');
-const { Op } = require('sequelize');
+const { Op, sequelize } = require('sequelize');
+
 
 /**
  * Get all equipment for a company
@@ -9,12 +10,21 @@ const { Op } = require('sequelize');
 exports.getAllEquipment = async (req, res, next) => {
   try {
     const { companyId } = req.user;
-    const { page = 1, limit = 10, search, locationId, category } = req.query;
+    const { page = 1, limit = 10, search, locationId, category, status, showDeleted = 'false' } = req.query;
     
     const offset = (page - 1) * limit;
     
     // Build query conditions
-    const whereConditions = { companyId };
+    const whereConditions = { 
+      companyId
+    };
+    
+    // Filter by isDeleted status
+    if (showDeleted === 'true') {
+      whereConditions.isDeleted = true;
+    } else {
+      whereConditions.isDeleted = false;
+    }
     
     // Add location filter if provided
     if (locationId) {
@@ -24,6 +34,11 @@ exports.getAllEquipment = async (req, res, next) => {
     // Add category filter if provided
     if (category) {
       whereConditions.category = category;
+    }
+
+    // Add status filter if provided
+    if (status) {
+      whereConditions.status = status;
     }
     
     // Add search filter if provided
@@ -68,7 +83,7 @@ exports.getEquipmentById = async (req, res, next) => {
     
     // Find equipment
     const equipment = await Equipment.findOne({
-      where: { id, companyId },
+      where: { id, companyId, isDeleted: false },
       include: [{ model: Location, as: 'location' }]
     });
     
@@ -89,7 +104,7 @@ exports.getEquipmentById = async (req, res, next) => {
 exports.createEquipment = async (req, res, next) => {
   try {
     const { companyId, role } = req.user;
-    
+    console.log('📥 Incoming Body:', req.body);
     // Only admin or supervisor can create equipment
     if (role !== 'admin' && role !== 'supervisor') {
       return responseHandler.error(res, 403, 'You do not have permission to create equipment');
@@ -97,7 +112,9 @@ exports.createEquipment = async (req, res, next) => {
     
     const { 
       name, description, model, manufacturer, 
-      serialNumber, category, locationId, notes 
+      serialNumber, category, locationId, notes,
+      status, purchaseDate, installationDate, warranty,
+      lastMaintenanceDate, nextMaintenanceDate
     } = req.body;
     
     // Validate location belongs to company
@@ -121,6 +138,12 @@ exports.createEquipment = async (req, res, next) => {
       category,
       locationId,
       notes,
+      status: status || 'running',
+      purchaseDate,
+      installationDate,
+      warranty,
+      lastMaintenanceDate,
+      nextMaintenanceDate,
       companyId
     });
     
@@ -152,7 +175,7 @@ exports.updateEquipment = async (req, res, next) => {
     
     // Find equipment
     const equipment = await Equipment.findOne({
-      where: { id, companyId }
+      where: { id, companyId, isDeleted: false }
     });
     
     if (!equipment) {
@@ -188,7 +211,7 @@ exports.updateEquipment = async (req, res, next) => {
 };
 
 /**
- * Delete equipment
+ * Soft delete equipment
  * @route DELETE /api/equipment/:id
  */
 exports.deleteEquipment = async (req, res, next) => {
@@ -203,7 +226,7 @@ exports.deleteEquipment = async (req, res, next) => {
     
     // Find equipment
     const equipment = await Equipment.findOne({
-      where: { id, companyId }
+      where: { id, companyId, isDeleted: false }
     });
     
     if (!equipment) {
@@ -236,10 +259,47 @@ exports.deleteEquipment = async (req, res, next) => {
       );
     }
     
-    // Delete equipment
-    await equipment.destroy();
+    // Soft delete equipment
+    await equipment.update({ isDeleted: true });
     
     return responseHandler.success(res, 200, 'Equipment deleted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Restore soft deleted equipment
+ * @route PUT /api/equipment/:id/restore
+ */
+exports.restoreEquipment = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { companyId, role } = req.user;
+    
+    // Only admin can restore equipment
+    if (role !== 'admin') {
+      return responseHandler.error(res, 403, 'Only admin can restore equipment');
+    }
+    
+    // Find equipment
+    const equipment = await Equipment.findOne({
+      where: { id, companyId, isDeleted: true }
+    });
+    
+    if (!equipment) {
+      return responseHandler.error(res, 404, 'Deleted equipment not found');
+    }
+    
+    // Restore equipment
+    await equipment.update({ isDeleted: false });
+    
+    // Fetch restored equipment with location
+    const restoredEquipment = await Equipment.findByPk(equipment.id, {
+      include: [{ model: Location, as: 'location' }]
+    });
+    
+    return responseHandler.success(res, 200, 'Equipment restored successfully', restoredEquipment);
   } catch (error) {
     next(error);
   }
@@ -266,7 +326,7 @@ exports.uploadImage = async (req, res, next) => {
     
     // Find equipment
     const equipment = await Equipment.findOne({
-      where: { id, companyId }
+      where: { id, companyId, isDeleted: false }
     });
     
     if (!equipment) {
@@ -304,7 +364,7 @@ exports.uploadFile = async (req, res, next) => {
     
     // Find equipment
     const equipment = await Equipment.findOne({
-      where: { id, companyId }
+      where: { id, companyId, isDeleted: false }
     });
     
     if (!equipment) {
@@ -328,23 +388,152 @@ exports.uploadFile = async (req, res, next) => {
 exports.getCategories = async (req, res, next) => {
   try {
     const { companyId } = req.user;
-    
+   
+   
+
     // Get distinct categories from equipment
     const categories = await Equipment.findAll({
-      attributes: [[sequelize.fn('DISTINCT', sequelize.col('category')), 'category']],
+      distinct: true,
+      attributes: ['category'],
       where: { 
         companyId,
-        category: { [Op.ne]: null }
+        category: { [Op.ne]: null },
+        isDeleted: false
       },
       raw: true
     });
-    
+    // console.log("Categories Retrieved:", categories);
+
     const categoryList = categories
       .map(item => item.category)
       .filter(category => category)
       .sort();
     
     return responseHandler.success(res, 200, 'Equipment categories retrieved successfully', categoryList);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get equipment statuses
+ * @route GET /api/equipment/statuses
+ */
+exports.getStatuses = async (req, res, next) => {
+  try {
+    // Return all possible statuses
+    const statuses = ['running', 'maintenance', 'out_of_service', 'standby'];
+    
+    return responseHandler.success(res, 200, 'Equipment statuses retrieved successfully', statuses);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Update equipment status
+ * @route PUT /api/equipment/:id/status
+ */
+exports.updateStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { companyId, role } = req.user;
+    const { status } = req.body;
+    
+    // Only admin, supervisor or technician can update equipment status
+    if (role !== 'admin' && role !== 'supervisor' && role !== 'technician') {
+      return responseHandler.error(res, 403, 'You do not have permission to update equipment status');
+    }
+    
+    // Validate status
+    const validStatuses = ['running', 'maintenance', 'out_of_service', 'standby'];
+    if (!validStatuses.includes(status)) {
+      return responseHandler.error(res, 400, 'Invalid status. Status must be one of: running, maintenance, out_of_service, standby');
+    }
+    
+    // Find equipment
+    const equipment = await Equipment.findOne({
+      where: { id, companyId, isDeleted: false }
+    });
+    
+    if (!equipment) {
+      return responseHandler.error(res, 404, 'Equipment not found');
+    }
+    
+    // Update status
+    equipment.status = status;
+    await equipment.save();
+    
+    return responseHandler.success(res, 200, 'Equipment status updated successfully', equipment);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get equipment with maintenance due
+ * @route GET /api/equipment/maintenance-due
+ */
+exports.getMaintenanceDue = async (req, res, next) => {
+  try {
+    const { companyId } = req.user;
+    const today = new Date();
+    
+    // Get equipment where nextMaintenanceDate is less than or equal to today
+    const equipment = await Equipment.findAll({
+      where: {
+        companyId,
+        isDeleted: false,
+        nextMaintenanceDate: {
+          [Op.lte]: today
+        }
+      },
+      include: [{ model: Location, as: 'location' }],
+      order: [['nextMaintenanceDate', 'ASC']]
+    });
+    
+    return responseHandler.success(res, 200, 'Maintenance due equipment retrieved successfully', equipment);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Update equipment maintenance dates
+ * @route PUT /api/equipment/:id/maintenance-dates
+ */
+exports.updateMaintenanceDates = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { companyId, role } = req.user;
+    const { lastMaintenanceDate, nextMaintenanceDate } = req.body;
+    
+    // Only admin, supervisor or technician can update maintenance dates
+    if (role !== 'admin' && role !== 'supervisor' && role !== 'technician') {
+      return responseHandler.error(res, 403, 'You do not have permission to update maintenance dates');
+    }
+    
+    // Find equipment
+    const equipment = await Equipment.findOne({
+      where: { id, companyId, isDeleted: false }
+    });
+    
+    if (!equipment) {
+      return responseHandler.error(res, 404, 'Equipment not found');
+    }
+    
+    // Update maintenance dates
+    if (lastMaintenanceDate) {
+      equipment.lastMaintenanceDate = new Date(lastMaintenanceDate);
+    }
+    
+    if (nextMaintenanceDate) {
+      equipment.nextMaintenanceDate = new Date(nextMaintenanceDate);
+    }
+    
+    await equipment.save();
+    
+    return responseHandler.success(res, 200, 'Maintenance dates updated successfully', equipment);
   } catch (error) {
     next(error);
   }

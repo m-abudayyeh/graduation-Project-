@@ -11,6 +11,12 @@ router.use(checkSubscription);
 // Get equipment categories
 router.get('/categories', equipmentController.getCategories);
 
+// Get equipment statuses
+router.get('/statuses', equipmentController.getStatuses);
+
+// Get equipment with maintenance due
+router.get('/maintenance-due', equipmentController.getMaintenanceDue);
+
 // Get all equipment
 router.get('/', equipmentController.getAllEquipment);
 
@@ -29,6 +35,27 @@ router.put(
   '/:id',
   authorizeRoles('admin', 'supervisor'),
   equipmentController.updateEquipment
+);
+
+// Restore deleted equipment (admin only)
+router.put(
+  '/:id/restore',
+  authorizeRoles('admin'),
+  equipmentController.restoreEquipment
+);
+
+// Update equipment status
+router.put(
+  '/:id/status',
+  authorizeRoles('admin', 'supervisor', 'technician'),
+  equipmentController.updateStatus
+);
+
+// Update equipment maintenance dates
+router.put(
+  '/:id/maintenance-dates',
+  authorizeRoles('admin', 'supervisor', 'technician'),
+  equipmentController.updateMaintenanceDates
 );
 
 // Delete equipment (admin only)
