@@ -2,6 +2,11 @@
 
 module.exports = (sequelize, DataTypes) => {
   const WorkOrder = sequelize.define('WorkOrder', {
+    workOrderNumber: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    },
     title: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -26,6 +31,26 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: []
     },
+    estimatedCost: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true
+    },
+    actualCost: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true
+    },
+    estimatedHours: {
+      type: DataTypes.DECIMAL(6, 2),
+      allowNull: true
+    },
+    actualHours: {
+      type: DataTypes.DECIMAL(6, 2),
+      allowNull: true
+    },
+    solution: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
     dueDate: {
       type: DataTypes.DATE,
       allowNull: true
@@ -46,11 +71,33 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true
     },
+    externalParts: {
+      type: DataTypes.JSONB,  
+      defaultValue: [],
+      allowNull: true
+    },
+    externalLocations: {
+      type: DataTypes.JSONB,  
+      defaultValue: [],
+      allowNull: true
+    },
+    tags: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      defaultValue: [],
+      allowNull: true
+    },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     isPreventive: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     }
-  }, {});
+  }, {
+    paranoid: true,
+    deletedAt: 'deletedAt'
+  });
 
   WorkOrder.associate = function(models) {
     // WorkOrder belongs to a Company

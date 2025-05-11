@@ -1,8 +1,8 @@
 // src/pages/maindashboard/MainDashboard.jsx
 import { useState, useEffect } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
-import Sidebar from './Sidebar';
-import Header from './Header';
+import Sidebar from './ComponentsMainDashboard/Sidebar';
+import Header from './ComponentsMainDashboard/Header';
 import axios from 'axios';
 
 const MainDashboard = () => {

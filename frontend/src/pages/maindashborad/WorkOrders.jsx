@@ -1,182 +1,290 @@
+// src/pages/maindashborad/WorkOrders.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import WorkOrderList from './WorkOrders/WorkOrderList';
+import WorkOrderForm from './WorkOrders/WorkOrderForm';
+import WorkOrderDetails from './WorkOrders/WorkOrderDetails';
+import WorkOrderCalendarView from './WorkOrders/WorkOrderCalendarView';
+import WorkOrderColumnView from './WorkOrders/WorkOrderColumnView';
+import DeletedWorkOrdersList from './WorkOrders/DeletedWorkOrdersList';
+import Loading from './WorkOrders/Loading';
+import Alert from './WorkOrders/Alert';
 
-const WorkOrders = ({ userId, onSuccess }) => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    phoneNumber: ''
-  });
+const WorkOrders = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [view, setView] = useState('list'); // list, calendar, columns, details, create, edit, deleted
+  const [workOrders, setWorkOrders] = useState([]);
+  const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState(null);
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 10,
+    search: '',
+    status: '',
+    priority: '',
+    assigneeId: '',
+    locationId: '',
+    equipmentId: '',
+    startDate: '',
+    endDate: '',
+  });
 
-  // Fetch user data when component mounts
+  // Parse URL params to determine the current view
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`/api/users/${userId}`, {
-          withCredentials: true
-        });
-        
-        const userData = response.data.data || response.data;
-        setFormData({
-          firstName: userData.firstName || '',
-          lastName: userData.lastName || '',
-          phoneNumber: userData.phoneNumber || ''
-        });
-        
-        setError(null);
-      } catch (err) {
-        setError('Failed to load user data. Please try again.');
-        console.error('Error fetching user:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userId) {
-      fetchUserData();
-    }
-  }, [userId]);
-
-  // Handle input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const params = new URLSearchParams(location.search);
+    const viewParam = params.get('view');
+    const idParam = params.get('id');
     
-    // Basic validation
-    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.phoneNumber.trim()) {
-      setError('All fields are required');
-      return;
+    if (viewParam) {
+      setView(viewParam);
     }
+    
+    if (idParam && (viewParam === 'details' || viewParam === 'edit')) {
+      fetchWorkOrderById(idParam);
+    }
+    
+    if (viewParam === 'list' || viewParam === 'calendar' || viewParam === 'columns' || viewParam === 'deleted') {
+      fetchWorkOrders();
+    }
+  }, [location.search]);
+
+  // Fetch work orders based on current filters
+  const fetchWorkOrders = async () => {
+    setLoading(true);
+    setError(null);
     
     try {
-      setLoading(true);
-      await axios.put(`http://localhost:5000/api/users/${userId}`, formData, {
-        withCredentials: true
-      });
+      const params = { ...filters };
       
-      setSuccess(true);
-      setError(null);
+      // If viewing deleted work orders, adjust the endpoint
+      const endpoint = view === 'deleted' ? '/api/work-orders/deleted' : '/api/work-orders';
       
-      // Call onSuccess callback if provided
-      if (onSuccess && typeof onSuccess === 'function') {
-        onSuccess();
+      const response = await axios.get(endpoint, { params });
+      
+      if (response.data && response.data.data) {
+        setWorkOrders(response.data.data.rows || []);
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to update profile';
-      setError(errorMessage);
-      console.error('Error updating user:', err);
+      setError(err.response?.data?.message || 'Error fetching work orders');
+      console.error('Error fetching work orders:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Reset form
-  const handleReset = () => {
-    setSuccess(false);
+  // Fetch a single work order by ID
+  const fetchWorkOrderById = async (id) => {
+    setLoading(true);
     setError(null);
+    
+    try {
+      const response = await axios.get(`/api/work-orders/${id}`);
+      
+      if (response.data && response.data.data) {
+        setSelectedWorkOrder(response.data.data);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error fetching work order details');
+      console.error('Error fetching work order details:', err);
+      navigate('/dashboard/work-orders?view=list');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Create a new work order
+  const createWorkOrder = async (workOrderData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await axios.post('/api/work-orders', workOrderData);
+      
+      if (response.data && response.data.data) {
+        setSuccess('Work order created successfully');
+        navigate(`/dashboard/work-orders?view=details&id=${response.data.data.id}`);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error creating work order');
+      console.error('Error creating work order:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update an existing work order
+  const updateWorkOrder = async (id, workOrderData) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await axios.put(`/api/work-orders/${id}`, workOrderData);
+      
+      if (response.data && response.data.data) {
+        setSelectedWorkOrder(response.data.data);
+        setSuccess('Work order updated successfully');
+        navigate(`/dashboard/work-orders?view=details&id=${id}`);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error updating work order');
+      console.error('Error updating work order:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete a work order
+  const deleteWorkOrder = async (id) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await axios.delete(`/api/work-orders/${id}`);
+      setSuccess('Work order deleted successfully');
+      
+      // If we just deleted the currently selected work order, go back to list
+      if (selectedWorkOrder && selectedWorkOrder.id === id) {
+        navigate('/dashboard/work-orders?view=list');
+      } else {
+        // Otherwise, just refresh the current list
+        fetchWorkOrders();
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error deleting work order');
+      console.error('Error deleting work order:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Restore a deleted work order
+  const restoreWorkOrder = async (id) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      await axios.put(`/api/work-orders/${id}/restore`);
+      setSuccess('Work order restored successfully');
+      fetchWorkOrders();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error restoring work order');
+      console.error('Error restoring work order:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters) => {
+    setFilters({ ...filters, ...newFilters, page: 1 });
+  };
+
+  // Handle pagination
+  const handlePageChange = (newPage) => {
+    setFilters({ ...filters, page: newPage });
+  };
+
+  // Change the view
+  const changeView = (newView, workOrderId = null) => {
+    const params = new URLSearchParams();
+    params.set('view', newView);
+    
+    if (workOrderId && (newView === 'details' || newView === 'edit')) {
+      params.set('id', workOrderId);
+    }
+    
+    navigate(`/dashboard/work-orders?${params.toString()}`);
+  };
+
+  // Render the appropriate component based on the current view
+  const renderContent = () => {
+    if (loading) {
+      return <Loading />;
+    }
+
+    switch (view) {
+      case 'create':
+        return (
+          <WorkOrderForm 
+            onSubmit={createWorkOrder} 
+            onCancel={() => changeView('list')} 
+          />
+        );
+      
+      case 'edit':
+        return (
+          <WorkOrderForm 
+            workOrder={selectedWorkOrder} 
+            onSubmit={(data) => updateWorkOrder(selectedWorkOrder.id, data)} 
+            onCancel={() => changeView('details', selectedWorkOrder.id)} 
+          />
+        );
+      
+      case 'details':
+        return (
+          <WorkOrderDetails 
+            workOrder={selectedWorkOrder} 
+            onEdit={() => changeView('edit', selectedWorkOrder.id)} 
+            onDelete={() => deleteWorkOrder(selectedWorkOrder.id)} 
+            onBack={() => changeView('list')} 
+          />
+        );
+      
+      case 'calendar':
+        return (
+          <WorkOrderCalendarView 
+            workOrders={workOrders} 
+            onSelectWorkOrder={(id) => changeView('details', id)} 
+          />
+        );
+      
+      case 'columns':
+        return (
+          <WorkOrderColumnView 
+            workOrders={workOrders} 
+            onSelectWorkOrder={(id) => changeView('details', id)} 
+          />
+        );
+      
+      case 'deleted':
+        return (
+          <DeletedWorkOrdersList 
+            workOrders={workOrders} 
+            onRestore={restoreWorkOrder} 
+            onViewDetails={(id) => changeView('details', id)} 
+          />
+        );
+      
+      case 'list':
+      default:
+        return (
+          <WorkOrderList 
+            workOrders={workOrders} 
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onPageChange={handlePageChange}
+            onSelectWorkOrder={(id) => changeView('details', id)} 
+            onCreateNew={() => changeView('create')} 
+            onViewDeleted={() => changeView('deleted')} 
+            onViewCalendar={() => changeView('calendar')} 
+            onViewColumns={() => changeView('columns')} 
+          />
+        );
+    }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-md mx-auto">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">تعديل الملف الشخصي</h2>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4 text-[#02245B]">Work Orders</h1>
       
-      {success ? (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          <p>تم تحديث الملف الشخصي بنجاح!</p>
-          <button 
-            onClick={handleReset}
-            className="mt-2 bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded text-sm"
-          >
-            تعديل مرة أخرى
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          
-          <div>
-            <label htmlFor="firstName" className="block text-gray-700 font-medium mb-1">
-              الاسم الأول
-            </label>
-            <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="أدخل الاسم الأول"
-              dir="rtl"
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="lastName" className="block text-gray-700 font-medium mb-1">
-              اسم العائلة
-            </label>
-            <input
-              type="text"
-              id="lastName"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="أدخل اسم العائلة"
-              dir="rtl"
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="phoneNumber" className="block text-gray-700 font-medium mb-1">
-              رقم الهاتف
-            </label>
-            <input
-              type="text"
-              id="phoneNumber"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="أدخل رقم الهاتف"
-              dir="rtl"
-            />
-          </div>
-          
-          <div className="flex justify-end space-x-4 pt-2">
-            <button
-              type="button"
-              onClick={handleReset}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none"
-              disabled={loading}
-            >
-              إلغاء
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none"
-              disabled={loading}
-            >
-              {loading ? 'جاري التحديث...' : 'تحديث'}
-            </button>
-          </div>
-        </form>
-      )}
+      {error && <Alert type="error" message={error} onClose={() => setError(null)} />}
+      {success && <Alert type="success" message={success} onClose={() => setSuccess(null)} />}
+      
+      {renderContent()}
     </div>
   );
 };

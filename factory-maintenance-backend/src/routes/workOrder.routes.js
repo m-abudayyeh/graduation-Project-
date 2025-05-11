@@ -11,8 +11,11 @@ router.use(checkSubscription);
 // Get work order statistics
 router.get('/statistics', workOrderController.getStatistics);
 
-// Get all work orders
+// Get all work orders (with option to include deleted)
 router.get('/', workOrderController.getAllWorkOrders);
+
+// Get all deleted work orders
+router.get('/deleted', authorizeRoles('admin'), workOrderController.getDeletedWorkOrders);
 
 // Get work order by ID
 router.get('/:id', workOrderController.getWorkOrderById);
@@ -28,6 +31,13 @@ router.post(
 router.put(
   '/:id',
   workOrderController.updateWorkOrder
+);
+
+// Restore deleted work order (admin only)
+router.put(
+  '/:id/restore',
+  authorizeRoles('admin'),
+  workOrderController.restoreWorkOrder
 );
 
 // Delete work order (admin only)
@@ -55,6 +65,18 @@ router.post(
 router.delete(
   '/:id/parts/:partId',
   workOrderController.removePart
+);
+
+// إضافة قطع غيار خارجية
+router.post(
+  '/:id/external-parts',
+  workOrderController.addExternalParts
+);
+
+// إضافة مواقع خارجية
+router.post(
+  '/:id/external-locations',
+  workOrderController.addExternalLocations
 );
 
 module.exports = router;

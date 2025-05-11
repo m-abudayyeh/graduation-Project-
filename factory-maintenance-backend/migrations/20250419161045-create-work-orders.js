@@ -8,6 +8,11 @@ module.exports = {
         primaryKey: true,
         allowNull: false
       },
+      workOrderNumber: {
+        type: Sequelize.STRING,
+        unique: true,
+        allowNull: false
+      },
       title: {
         type: Sequelize.STRING,
         allowNull: false
@@ -29,6 +34,26 @@ module.exports = {
         allowNull: true,
         defaultValue: []
       },
+      estimatedCost: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: true
+      },
+      actualCost: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: true
+      },
+      estimatedHours: {
+        type: Sequelize.DECIMAL(6, 2),
+        allowNull: true
+      },
+      actualHours: {
+        type: Sequelize.DECIMAL(6, 2),
+        allowNull: true
+      },
+      solution: {
+        type: Sequelize.TEXT,
+        allowNull: true
+      },
       dueDate: {
         type: Sequelize.DATE,
         allowNull: true
@@ -49,9 +74,32 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true
       },
+      externalParts: {
+        type: Sequelize.JSONB,  
+        defaultValue: [],
+        allowNull: true
+      },
+      externalLocations: {
+        type: Sequelize.JSONB,  
+        defaultValue: [],
+        allowNull: true
+      },
+      tags: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        defaultValue: [],
+        allowNull: true
+      },
+      isDeleted: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
       isPreventive: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
+      },
+      deletedAt: {
+        type: Sequelize.DATE,
+        allowNull: true
       },
       companyId: {
         type: Sequelize.INTEGER,

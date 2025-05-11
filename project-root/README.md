@@ -1,14 +1,14 @@
-# 🏭 OptiPlant – Factory Maintenance & Task Management System
+#  OptiPlant – Factory Maintenance & Task Management System
 
 [![Live Demo](https://img.shields.io/badge/Figma-Preview-blue?style=flat&logo=figma)](https://www.figma.com/design/zDGa6WPRS2pSSsP0OCp4tp/Graduation-project?node-id=0-1&t=5KEMVibbXcJ1Tplp-1)
 
-## 📌 Project Overview
+##  Project Overview
 
 **OptiPlant** is a web-based platform designed to streamline **maintenance task management** in factories and industrial environments. It enables organizations to track work orders, schedule preventive maintenance, manage assets, and monitor operations in real time.
 
 ---
 
-## 👥 Target Users
+##  Target Users
 
 - Factory Managers  
 - Maintenance Supervisors  
@@ -18,27 +18,28 @@
 
 ---
 
-## ✨ Core Features
+##  Core Features
 
-- 🔧 Work Order Management  
-- 🛠 Preventive Maintenance Scheduling  
-- 📊 Real-time Analytics and Reports  
-- 📝 Maintenance Request Submission  
-- 📍 Location, Machine, Store, and Employee Management  
-- 🔔 Notification System  
-- 💳 Subscription and Payment System  
+-  Work Order Management  
+- Preventive Maintenance Scheduling  
+- Real-time Analytics and Reports  
+-  Maintenance Request Submission  
+-  Location, Machine, Store, and Employee Management  
+-  Notification System  
+- Subscription and Payment System  
 
 ---
 
-## 🧭 Website Structure
+##  Website Structure
 
-### 🌐 Public Pages
+###  Public Pages
 - Home
 - About Us
 - Contact Us
+- Services
 - Registration & Login
 
-### 🧑‍💼 Dashboard (After Login)
+###  Dashboard (After Login)
 - Work Orders  
 - Preventive Maintenance  
 - Analytics  
@@ -51,7 +52,7 @@
 - Company Profile  
 - Notifications  
 
-### 🛡 Super Admin Panel
+###  Super Admin Panel
 - Manage Contact Messages  
 - Global Stats  
 - Manage Companies  
@@ -60,7 +61,7 @@
 
 ---
 
-## 🔐 User Roles & Permissions
+##  User Roles & Permissions
 
 | Role         | Permissions |
 |--------------|-------------|
@@ -73,7 +74,7 @@
 
 ---
 
-## 🧾 Registration & Authentication
+##  Registration & Authentication
 
 - Email Verification  
 - 7-Day Free Trial  
@@ -82,7 +83,7 @@
 
 ---
 
-## 📈 Analytics Dashboard
+##  Analytics Dashboard
 
 - Open Tasks Count  
 - Requests Summary  
@@ -91,26 +92,27 @@
 
 ---
 
-## 💳 Pricing
+##  Pricing
 
+- **$Free / 7Days** 
 - **$20 / month**  
 - **$216 / year**  
 - Reminders for subscription expiry
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
-### 🔙 Backend
+###  Backend
 - Node.js, Express, MVC  
 - PostgreSQL + Sequelize  
 - JWT Auth  
 - .env Configuration  
 
-### 🔜 Frontend
+###  Frontend
 - React (Vite)  
 - Tailwind CSS  
-- Redux & Axios  
+- Axios  
 - EmailJS for contact system  
 
 ---
@@ -126,7 +128,7 @@
 
 ---
 
-## 🔔 Notification System
+##  Notification System
 
 - New Task Assignments  
 - Request Status Updates  
@@ -135,13 +137,20 @@
 
 ---
 
-## 📂 Figma Design
+##  Figma Design
 
 [🔗 View Design on Figma](https://www.figma.com/design/zDGa6WPRS2pSSsP0OCp4tp/Graduation-project?node-id=0-1&t=5KEMVibbXcJ1Tplp-1)
 
 ---
 
-## 💡 Usage Flow
+## 📄 Project Documentation
+
+-  [Brief Summary (PDF)](./brief.pdf)
+-  [Full Description (PDF)](./Full%20Description.pdf)
+
+---
+
+##  Usage Flow
 
 1. Browse public pages  
 2. Register with your company  
@@ -151,10 +160,9 @@
 
 ---
 
-## 📫 Contact
+##  Contact
 
 For feedback or support, please use the **Contact Us** form on the website.
 
 ---
 
-> © 2025 OptiPlant – All rights reserved.
