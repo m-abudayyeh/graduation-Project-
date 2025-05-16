@@ -13,6 +13,11 @@ const errorHandler = require('./middlewares/errorHandler');
 // Create Express app
 const app = express();
 
+// 1️⃣ Webhook أول شيء قبل أي middleware ثاني
+app.post('/api/subscriptions/webhook', express.raw({ type: 'application/json' }), 
+  require('./controllers/subscription.controller').handleWebhook);
+
+
 // Enable CORS with credentials support
 app.use(cors({
   origin: 'http://localhost:5173', 

@@ -1,6 +1,14 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    // أولاً: إنشاء أنواع ENUM (استخدام أحرف صغيرة للاتساق)
+    await queryInterface.sequelize.query(`
+      CREATE TYPE "enum_subscriptions_plantype" AS ENUM ('monthly', 'annual');
+      CREATE TYPE "enum_subscriptions_status" AS ENUM ('active', 'expired', 'cancelled', 'trial');
+      CREATE TYPE "enum_subscriptions_notificationpreference" AS ENUM ('email', 'in-app', 'both', 'none');
+    `);
+
+    // ثانياً: إنشاء الجدول
     await queryInterface.createTable('Subscriptions', {
       id: {
         type: Sequelize.INTEGER,
@@ -9,7 +17,7 @@ module.exports = {
         allowNull: false
       },
       planType: {
-        type: Sequelize.ENUM('monthly', 'annual'),
+        type: "enum_subscriptions_plantype",  // استخدام نفس اسم النوع بالضبط
         allowNull: false
       },
       startDate: {
@@ -29,8 +37,16 @@ module.exports = {
         defaultValue: 'USD'
       },
       status: {
-        type: Sequelize.ENUM('active', 'expired', 'cancelled'),
-        defaultValue: 'active'
+        type: "enum_subscriptions_status",  // استخدام نفس اسم النوع بالضبط
+        defaultValue: 'trial'
+      },
+      isTrial: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
+      },
+      trialEndDate: {
+        type: Sequelize.DATE,
+        allowNull: true
       },
       stripeSubscriptionId: {
         type: Sequelize.STRING,
@@ -48,6 +64,18 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
+      notificationPreference: {
+        type: "enum_subscriptions_notificationpreference",  // استخدام نفس اسم النوع بالضبط
+        defaultValue: 'both'
+      },
+      maxUsers: {
+        type: Sequelize.INTEGER,
+        defaultValue: 10
+      },
+      lastNotificationSent: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
       companyId: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -57,6 +85,26 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
+      },
+      createdBy: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      },
+      lastModifiedBy: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Users',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       createdAt: {
         allowNull: false,
@@ -72,6 +120,14 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
+    // أولاً: حذف الجدول
     await queryInterface.dropTable('Subscriptions');
+    
+    // ثانياً: حذف أنواع ENUM
+    await queryInterface.sequelize.query(`
+      DROP TYPE IF EXISTS "enum_subscriptions_plantype";
+      DROP TYPE IF EXISTS "enum_subscriptions_status";
+      DROP TYPE IF EXISTS "enum_subscriptions_notificationpreference";
+    `);
   }
 };

@@ -1,33 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const subscriptionController = require('../controllers/subscription.controller');
-const { authenticateToken, authorizeRoles, checkCompanyAccess } = require('../middlewares/auth');
+const { authenticateToken, authorizeRoles } = require('../middlewares/auth');
 
-// Webhook route (no auth)
-router.post('/webhook', express.raw({ type: 'application/json' }), subscriptionController.handleWebhook);
 
-// Protected routes
+// Apply authentication middleware to all routes
 router.use(authenticateToken);
 
-// Get company subscription
-router.get(
-  '/company/:companyId',
-  checkCompanyAccess,
-  subscriptionController.getCompanySubscription
-);
+// Get subscription details for a company
+router.get('/company/:companyId', subscriptionController.getCompanySubscription);
 
-// Create checkout session
-router.post(
-  '/create-checkout-session',
-  authorizeRoles('admin'),
-  subscriptionController.createCheckoutSession
-);
+// Create free trial subscription
+router.post('/create-trial', authorizeRoles(['admin']), subscriptionController.createTrialSubscription);
+
+// Create Stripe checkout session
+router.post('/create-checkout-session', subscriptionController.createCheckoutSession);
 
 // Cancel subscription
-router.post(
-  '/cancel',
-  authorizeRoles('admin'),
-  subscriptionController.cancelSubscription
-);
+router.post('/cancel', authorizeRoles(['admin']), subscriptionController.cancelSubscription);
+
+// Update subscription preferences
+router.patch('/:id', authorizeRoles(['admin']), subscriptionController.updateSubscriptionPreferences);
+
+// POST /api/subscriptions/verify-payment
+router.post('/verify-payment', subscriptionController.verifyPayment);
 
 module.exports = router;

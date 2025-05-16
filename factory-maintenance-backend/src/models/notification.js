@@ -42,19 +42,25 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
 
-  Notification.associate = function(models) {
-    // Notification belongs to a User
-    Notification.belongsTo(models.User, {
-      foreignKey: 'userId',
-      as: 'user'
-    });
+ Notification.associate = function(models) {
+  // Notification belongs to a User
+  Notification.belongsTo(models.User, {
+    foreignKey: 'userId',
+    as: 'user'
+  });
 
-    // Notification belongs to a Company
-    Notification.belongsTo(models.Company, {
-      foreignKey: 'companyId',
-      as: 'company'
-    });
-  };
+  // Notification belongs to a Company
+  Notification.belongsTo(models.Company, {
+    foreignKey: 'companyId',
+    as: 'company'
+  });
+
+  // Notification belongs to a Subscription
+  Notification.belongsTo(models.Subscription, {
+    foreignKey: 'subscriptionId',
+    as: 'subscription'
+  });
+};
 
   return Notification;
 };

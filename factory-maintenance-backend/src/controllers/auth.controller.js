@@ -21,7 +21,8 @@ exports.register = async (req, res, next) => {
     // Create company
     const company = await Company.create({
       name: companyName,
-      subscriptionStatus: 'trial',
+      subscriptionType:'trial',
+      subscriptionStatus: 'active',
       subscriptionStartDate: new Date(),
       subscriptionEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
     });
@@ -135,10 +136,10 @@ exports.login = async (req, res, next) => {
     
     // Set token in HTTP-only cookie
     res.cookie('jwt', token, {
-      httpOnly: true,              // منع الوصول من JavaScript
-      secure: process.env.NODE_ENV === 'production', // استخدام HTTPS في الإنتاج فقط
-      sameSite: 'strict',          // حماية من هجمات CSRF
-      maxAge: parseInt(process.env.JWT_EXPIRES_IN) * 1000 || 24 * 60 * 60 * 1000  // صلاحية التوكن
+      httpOnly: true,             
+      secure: process.env.NODE_ENV === 'production', 
+      sameSite: 'strict',          
+      maxAge: parseInt(process.env.JWT_EXPIRES_IN) * 1000 || 24 * 60 * 60 * 1000  
     });
 
     // Return user data without password

@@ -34,12 +34,12 @@ module.exports = {
         allowNull: true
       },
       subscriptionStatus: {
-        type: Sequelize.ENUM('trial', 'active', 'expired'),
-        defaultValue: 'trial'
+        type: Sequelize.ENUM( 'active', 'expired'),
+        defaultValue: 'active'
       },
       subscriptionType: {
-        type: Sequelize.ENUM('monthly', 'annual', 'none'),
-        defaultValue: 'none'
+        type: Sequelize.ENUM('monthly', 'annual', 'trial'),
+        defaultValue: 'trial'
       },
       subscriptionStartDate: {
         type: Sequelize.DATE,

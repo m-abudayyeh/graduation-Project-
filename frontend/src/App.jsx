@@ -11,6 +11,7 @@ import AboutUs from './pages/puplicpage/about';
 import ContactPage from './pages/puplicpage/contact';
 import Login from './pages/Authpages/login';
 import Register from './pages/Authpages/register';
+import ServicesPage from './pages/puplicpage/ServicesPage';
 
 // Import dashboard components
 import MainDashboard from './pages/maindashborad/maindashborad';
@@ -25,7 +26,12 @@ import Locations from './pages/maindashborad/Locations';
 import Meters from './pages/maindashborad/Meters';
 import Vendors from './pages/maindashborad/Vendors';
 import Employees from './pages/maindashborad/Employees';
+import Subscription from './pages/maindashborad/Subscription';
 
+// Import subscription pages
+import SubscriptionSuccess from './pages/SubscriptionSuccess';
+import SubscriptionCancel from './pages/SubscriptionCancel';
+import SubscriptionRenew from './pages/SubscriptionRenew';
 
 // Import admin dashboard components
 import AdminDashboard from './pages/admindashoard/AdminDashboard';
@@ -33,8 +39,6 @@ import AdminDashboardHome from './pages/admindashoard/AdminDashboardHome';
 import Users from './pages/admindashoard/Users';
 import Settings from './pages/admindashoard/Settings';
 import Reports from './pages/admindashoard/Reports';
-// import MaintenanceRequests from './pages/admindashoard/MaintenanceRequests';
-// import SystemLogs from './pages/admindashoard/SystemLogs';
 
 
 function App() {
@@ -46,12 +50,17 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactPage />} />
+            <Route path="/services" element={<ServicesPage />} />
         </Route>
 
-        <Route>
+        {/* Auth routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        </Route>
+
+        {/* Subscription redirect pages (outside of dashboard layout) */}
+        <Route path="/dashboard/subscription/success" element={<SubscriptionSuccess />} />
+        <Route path="/dashboard/subscription/cancel" element={<SubscriptionCancel />} />
+        <Route path="/dashboard/subscription/renew" element={<SubscriptionRenew />} />
 
         {/* Dashboard routes - without Navbar */}
         <Route path="/dashboard" element={<MainDashboard />}>
@@ -66,14 +75,17 @@ function App() {
           <Route path="meters" element={<Meters />} />
           <Route path="vendors" element={<Vendors />} />
           <Route path="employees" element={<Employees />} />
+          <Route path="subscription" element={<Subscription />} />
         </Route>
         
+        {/* Admin Dashboard routes */}
         <Route path="/admin" element={<AdminDashboard />}>
           <Route index element={<AdminDashboardHome />} />
           <Route path="users" element={<Users />} />
           <Route path="settings" element={<Settings />} />
           <Route path="reports" element={<Reports />} />
         </Route>
+        
         {/* Redirect unknown routes to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
