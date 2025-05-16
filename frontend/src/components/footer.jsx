@@ -11,7 +11,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="pt-16 pb-6 relative overflow-hidden" style={{ backgroundColor: '#02245B' }}>
+    <footer className="pt-16 pb-6 relative overflow-hidden " style={{ backgroundColor: '#02245B' }}>
       {/* Background decoration elements */}
       <div 
         className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-5"
@@ -27,7 +27,7 @@ const Footer = () => {
           transform: 'translate(-30%, 30%)'
         }}
       ></div>
-      
+      <div className='mx-12'>
       <div className="container mx-auto px-6 relative z-10">
         {/* Top section with logo and social media */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-12 border-b border-opacity-20 border-gray-400 pb-10">
@@ -57,62 +57,8 @@ const Footer = () => {
               </div>
             </div>
             <p style={{ color: '#F5F5F5' }} className="mt-2 max-w-md opacity-80 leading-relaxed">
-              Providing innovative maintenance solutions since 2010. We help organizations optimize their operations, reduce downtime, and maximize efficiency.
+              Providing innovative solutions. We help organizations optimize their operations, reduce downtime, and maximize efficiency.
             </p>
-          </div>
-          
-          <div className="flex flex-col items-center md:items-end">
-            {/* <div className="flex space-x-3 mb-4">
-              <a href="#" className="p-3 rounded-full transition-all duration-300 transform hover:scale-110 relative overflow-hidden group" 
-                 style={{ backgroundColor: 'rgba(255, 94, 20, 0.2)' }}>
-                <span 
-                  className="absolute inset-0 w-full h-full rounded-full transition-all duration-300 ease-out transform scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100"
-                  style={{ 
-                    background: 'linear-gradient(135deg, #FF5E14 0%, #FF7A40 100%)',
-                    zIndex: -1
-                  }}
-                ></span>
-                <Facebook className="h-5 w-5 text-white" />
-              </a>
-              <a href="#" className="p-3 rounded-full transition-all duration-300 transform hover:scale-110 relative overflow-hidden group" 
-                 style={{ backgroundColor: 'rgba(255, 94, 20, 0.2)' }}>
-                <span 
-                  className="absolute inset-0 w-full h-full rounded-full transition-all duration-300 ease-out transform scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100"
-                  style={{ 
-                    background: 'linear-gradient(135deg, #FF5E14 0%, #FF7A40 100%)',
-                    zIndex: -1
-                  }}
-                ></span>
-                <Twitter className="h-5 w-5 text-white" />
-              </a>
-              <a href="#" className="p-3 rounded-full transition-all duration-300 transform hover:scale-110 relative overflow-hidden group" 
-                 style={{ backgroundColor: 'rgba(255, 94, 20, 0.2)' }}>
-                <span 
-                  className="absolute inset-0 w-full h-full rounded-full transition-all duration-300 ease-out transform scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100"
-                  style={{ 
-                    background: 'linear-gradient(135deg, #FF5E14 0%, #FF7A40 100%)',
-                    zIndex: -1
-                  }}
-                ></span>
-                <Instagram className="h-5 w-5 text-white" />
-              </a>
-              <a href="#" className="p-3 rounded-full transition-all duration-300 transform hover:scale-110 relative overflow-hidden group" 
-                 style={{ backgroundColor: 'rgba(255, 94, 20, 0.2)' }}>
-                <span 
-                  className="absolute inset-0 w-full h-full rounded-full transition-all duration-300 ease-out transform scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100"
-                  style={{ 
-                    background: 'linear-gradient(135deg, #FF5E14 0%, #FF7A40 100%)',
-                    zIndex: -1
-                  }}
-                ></span>
-                <Linkedin className="h-5 w-5 text-white" />
-              </a>
-            </div> */}
-            
-            {/* <div className="flex items-center" style={{ color: '#F5F5F5' }}>
-              <Clock className="h-5 w-5 mr-2" style={{ color: '#FF5E14' }} />
-              <span>Working Hours: Mon - Fri, 9:00 AM - 5:00 PM</span>
-            </div> */}
           </div>
         </div>
 
@@ -128,7 +74,7 @@ const Footer = () => {
               <li className="flex items-start group">
                 <MapPin className="mr-3 h-5 w-5 flex-shrink-0 mt-1 transition-colors duration-300" style={{ color: '#FF5E14' }} />
                 <div style={{ color: '#F5F5F5' }} className="group-hover:text-white transition-colors duration-300">
-                  <p className="leading-snug">1234 Business Avenue,</p>
+                  <p className="leading-snug"></p>
                   <p className="leading-snug">Amman, Jordan</p>
                 </div>
               </li>
@@ -138,7 +84,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center group">
                 <Mail className="mr-3 h-5 w-5 flex-shrink-0 transition-colors duration-300" style={{ color: '#FF5E14' }} />
-                <span style={{ color: '#F5F5F5' }} className="group-hover:text-white transition-colors duration-300">mohammed.a@gmail.com</span>
+                <span style={{ color: '#F5F5F5' }} className="group-hover:text-white transition-colors duration-300">optiplant.mailer@gmail.com</span>
               </li>
             </ul>
           </div>
@@ -151,56 +97,57 @@ const Footer = () => {
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link 
-                  to="/" 
-                  className="flex items-center transition-all duration-300 hover:translate-x-1 relative group overflow-hidden"
-                >
-                  <span className="mr-2 transition-all duration-300 text-lg" style={{ color: '#FF5E14' }}>&#x2192;</span>
-                  <span style={{ color: '#F5F5F5' }} className="relative z-10 group-hover:text-white">Home</span>
-                  <span 
-                    className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
-                    style={{ backgroundColor: '#FF5E14' }}
-                  ></span>
-                </Link>
+            <a 
+  href="/" 
+  className="flex items-center transition-all duration-300 hover:translate-x-1 relative group overflow-hidden"
+>
+  <span className="mr-2 transition-all duration-300 text-lg" style={{ color: '#FF5E14' }}>&#x2192;</span>
+  <span style={{ color: '#F5F5F5' }} className="relative z-10 group-hover:text-white">Home</span>
+  <span 
+    className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
+    style={{ backgroundColor: '#FF5E14' }}
+  ></span>
+</a>
+              </li>
+                            <li>
+            <a 
+  href="/services"
+  className="flex items-center transition-all duration-300 hover:translate-x-1 relative group overflow-hidden"
+>
+  <span className="mr-2 transition-all duration-300 text-lg" style={{ color: '#FF5E14' }}>&#x2192;</span>
+  <span style={{ color: '#F5F5F5' }} className="relative z-10 group-hover:text-white">Our Services</span>
+  <span 
+    className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
+    style={{ backgroundColor: '#FF5E14' }}
+  ></span>
+</a>
               </li>
               <li>
-                <Link 
-                  to="/about" 
-                  className="flex items-center transition-all duration-300 hover:translate-x-1 relative group overflow-hidden"
-                >
-                  <span className="mr-2 transition-all duration-300 text-lg" style={{ color: '#FF5E14' }}>&#x2192;</span>
-                  <span style={{ color: '#F5F5F5' }} className="relative z-10 group-hover:text-white">About Us</span>
-                  <span 
-                    className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
-                    style={{ backgroundColor: '#FF5E14' }}
-                  ></span>
-                </Link>
+            <a 
+  href="/about"
+  className="flex items-center transition-all duration-300 hover:translate-x-1 relative group overflow-hidden"
+>
+  <span className="mr-2 transition-all duration-300 text-lg" style={{ color: '#FF5E14' }}>&#x2192;</span>
+  <span style={{ color: '#F5F5F5' }} className="relative z-10 group-hover:text-white">About Us</span>
+  <span 
+    className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
+    style={{ backgroundColor: '#FF5E14' }}
+  ></span>
+</a>
+
               </li>
               <li>
-                <Link 
-                  to="/contact" 
-                  className="flex items-center transition-all duration-300 hover:translate-x-1 relative group overflow-hidden"
-                >
-                  <span className="mr-2 transition-all duration-300 text-lg" style={{ color: '#FF5E14' }}>&#x2192;</span>
-                  <span style={{ color: '#F5F5F5' }} className="relative z-10 group-hover:text-white">Contact Us</span>
-                  <span 
-                    className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
-                    style={{ backgroundColor: '#FF5E14' }}
-                  ></span>
-                </Link>
-              </li>
-              <li>
-                <Link 
-                  to="/services" 
-                  className="flex items-center transition-all duration-300 hover:translate-x-1 relative group overflow-hidden"
-                >
-                  <span className="mr-2 transition-all duration-300 text-lg" style={{ color: '#FF5E14' }}>&#x2192;</span>
-                  <span style={{ color: '#F5F5F5' }} className="relative z-10 group-hover:text-white">Our Services</span>
-                  <span 
-                    className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
-                    style={{ backgroundColor: '#FF5E14' }}
-                  ></span>
-                </Link>
+            <a 
+  href="/contact"
+  className="flex items-center transition-all duration-300 hover:translate-x-1 relative group overflow-hidden"
+>
+  <span className="mr-2 transition-all duration-300 text-lg" style={{ color: '#FF5E14' }}>&#x2192;</span>
+  <span style={{ color: '#F5F5F5' }} className="relative z-10 group-hover:text-white">Contact Us</span>
+  <span 
+    className="absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
+    style={{ backgroundColor: '#FF5E14' }}
+  ></span>
+</a>
               </li>
             </ul>
           </div>
@@ -335,7 +282,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-
+</div>
       {/* Scroll to top button */}
       <div className="fixed bottom-6 right-6 z-50">
         <button 

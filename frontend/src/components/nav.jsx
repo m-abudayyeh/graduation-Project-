@@ -50,7 +50,7 @@ const Navbar = () => {
         borderBottom: scrolled ? 'none' : '1px solid rgba(95, 101, 111, 0.1)'
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-16 px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">

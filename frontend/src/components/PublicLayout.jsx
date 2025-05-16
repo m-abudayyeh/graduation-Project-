@@ -10,7 +10,7 @@ const PublicLayout = () => {
       <header>
         <Navbar />
       </header>
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto  ">
         <Outlet />
       </main>
       <Footer />

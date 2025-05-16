@@ -39,7 +39,7 @@ const ProcessSection = () => {
   ];
 
   return (
-    <div className="py-20 bg-gray-100">
+    <div className="py-20 ">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Custom Development Process</h2>
@@ -50,7 +50,7 @@ const ProcessSection = () => {
         </div>
         
         {/* Process Steps - Desktop */}
-        <div className="hidden lg:block relative mb-8">
+        <div className="hidden lg:block relative mb-8 mx-24">
           {/* Connection Line */}
           <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-300 -translate-y-1/2"></div>
           
