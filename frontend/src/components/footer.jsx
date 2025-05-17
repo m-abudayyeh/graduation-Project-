@@ -75,7 +75,7 @@ const Footer = () => {
                 <MapPin className="mr-3 h-5 w-5 flex-shrink-0 mt-1 transition-colors duration-300" style={{ color: '#FF5E14' }} />
                 <div style={{ color: '#F5F5F5' }} className="group-hover:text-white transition-colors duration-300">
                   <p className="leading-snug"></p>
-                  <p className="leading-snug">Amman, Jordan</p>
+                  <p className="leading-snug">Al-Zarqa, Jordan</p>
                 </div>
               </li>
               <li className="flex items-center group">

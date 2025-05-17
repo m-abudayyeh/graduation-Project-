@@ -4,8 +4,8 @@ import React from 'react';
 const StatisticsHighlight = () => {
   const stats = [
     {
-      value: '35%',
-      label: 'Average reduction in maintenance downtime',
+      // value: '35%',
+      label: ' Reduction in maintenance downtime',
       icon: (
         <svg className="w-12 h-12 text-[#FF5E14]" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"></path>
@@ -13,7 +13,7 @@ const StatisticsHighlight = () => {
       )
     },
     {
-      value: '50%',
+      // value: '50%',
       label: 'Improved maintenance team efficiency',
       icon: (
         <svg className="w-12 h-12 text-[#FF5E14]" fill="currentColor" viewBox="0 0 20 20">
@@ -22,7 +22,7 @@ const StatisticsHighlight = () => {
       )
     },
     {
-      value: '40%',
+      // value: '40%',
       label: 'Reduction in unexpected equipment failures',
       icon: (
         <svg className="w-12 h-12 text-[#FF5E14]" fill="currentColor" viewBox="0 0 20 20">
@@ -31,7 +31,7 @@ const StatisticsHighlight = () => {
       )
     },
     {
-      value: '20%',
+      // value: '20%',
       label: 'Decrease in maintenance costs',
       icon: (
         <svg className="w-12 h-12 text-[#FF5E14]" fill="currentColor" viewBox="0 0 20 20">
@@ -59,7 +59,7 @@ const StatisticsHighlight = () => {
             >
               <div className="flex justify-center mb-4">{stat.icon}</div>
               <div className="text-4xl font-bold mb-2">{stat.value}</div>
-              <p>{stat.label}</p>
+              <p className="text-2xl font-bold mb-2">{stat.label}</p>
             </div>
           ))}
         </div>

@@ -25,11 +25,11 @@ const Home = () => {
       <HowItWorks />
       <Testimonials />
       <PricingPlans />
-      <DashboardPreview />
+      {/* <DashboardPreview /> */}
       <StatisticsHighlight />
       <FaqSection />
       <ContactInfo />
-      <TrialSignup />
+      {/* <TrialSignup /> */}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 // src/components/home/KeyFeatures.jsx
 import React from 'react';
-import { BsClipboardCheck, BsCalendarCheck, BsGraphUp, BsTools, BsBuilding } from 'react-icons/bs';
+import { BsClipboardCheck, BsCalendarCheck, BsGraphUp, BsTools, BsBuilding ,BsBell} from 'react-icons/bs';
 
 const KeyFeatures = () => {
   const features = [
@@ -28,7 +28,12 @@ const KeyFeatures = () => {
       icon: <BsBuilding className="text-4xl text-[#FF5E14] mb-4" />,
       title: 'Multi-location Support',
       description: 'Manage maintenance across multiple facilities from a single platform.'
-    }
+    },
+    {
+  icon: <BsBell className="text-4xl text-[#FF5E14] mb-4" />,
+  title: 'Real-Time Alerts',
+  description: 'Stay informed with instant notifications for maintenance events, task updates, and system anomalies.'
+}
   ];
 
   return (
@@ -41,7 +46,7 @@ const KeyFeatures = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mx-24">
           {features.map((feature, index) => (
             <div 
               key={index} 

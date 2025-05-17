@@ -5,27 +5,27 @@ import { Link } from 'react-router-dom';
 const HeroBanner = () => {
   // Slider data
   const slides = [
-    {
-      id: 1,
-      title: "Optimize Your Factory Maintenance",
-      description: "Comprehensive maintenance management solutions to streamline industrial operations and reduce downtime",
-      image: "/images/factory-dashboard.png",
-      gradient: "from-[#02245B] to-[#5F656F]"
-    },
-    {
-      id: 2,
-      title: "Track & Schedule Maintenance Effortlessly",
-      description: "Automate preventive maintenance scheduling and work order tracking in one unified system",
-      image: "/images/maintenance-team.png",
-      gradient: "from-[#FF5E14] to-[#FF8F14]"
-    },
-    {
-      id: 3,
-      title: "Advanced Maintenance Analytics",
-      description: "Valuable insights and key performance metrics to enhance maintenance efficiency",
-      image: "/images/analytics-dashboard.png",
-      gradient: "from-[#02245B] to-[#0A4FAA]"
-    }
+      {
+    id: 1,
+    title: "Optimize Your Factory Maintenance",
+    description: "Boost reliability and extend equipment lifespan with smart maintenance planning tailored for industrial environments.",
+    image: "pexels-photo-8985607.webp",
+    gradient: "from-[#02245B] to-[#5F656F]"
+  },
+  {
+    id: 2,
+    title: "Track & Schedule Energy Effortlessly",
+    description: "Monitor energy consumption, schedule usage, and automate maintenance to reduce waste and improve operational efficiency.",
+    image: "pexels-photo-2569839.jpeg",
+    gradient: "from-[#3F3F3F] to-[#5C5C5C]"
+  },
+  {
+    id: 3,
+    title: "Advanced Production Analytics",
+    description: "Analyze real-time performance, detect inefficiencies, and make data-driven decisions to improve production output and quality.",
+    image: "pexels-photo-4481326.jpeg",
+    gradient: "from-[#02245B] to-[#0A4FAA]"
+  }
   ];
 
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -76,27 +76,34 @@ const HeroBanner = () => {
       </div>
       
       {/* Slides */}
-      <div className="relative h-full">
+      <div className="relative h-full ">
         {slides.map((slide, index) => (
           <div 
             key={slide.id}
             className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out
               ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
           >
-            {/* Slide background */}
-            <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} transition-all duration-1000`}></div>
-            <div className="absolute inset-0 bg-pattern opacity-10"></div>
+            {/* Slide background image */}
+            <div className="absolute inset-0 bg-cover bg-center z-0" style={{ backgroundImage: `url(${slide.image})` }}></div>
+            
+            {/* Darkening overlay */}
+            <div className="absolute inset-0  z-0"></div>
+            
+            {/* Color gradient overlay (reduced opacity) */}
+            <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient} opacity-70 z-0`}></div>
+            
+            <div className="absolute inset-0 bg-pattern opacity-10 z-0"></div>
             
             {/* Slide content */}
-            <div className="container mx-auto px-4 h-full flex items-center relative z-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center h-full py-16">
+            <div className="container px-4 h-full flex items-center relative z-10 mx-24">
+              <div className="w-full md:w-3/5 lg:w-1/2 py-8">
                 <div className={`text-white transition-all duration-700 transform 
                   ${index === currentSlide ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
                   style={{ transitionDelay: '300ms' }}
                 >
-                  <span className="inline-block px-4 py-1 bg-white/10 backdrop-blur-sm text-white rounded-full mb-4 border border-white/20">
+                  {/* <span className="inline-block px-4 py-1 bg-white/10 backdrop-blur-sm text-white rounded-full mb-4 border border-white/20">
                     Factory Maintenance Management System
-                  </span>
+                  </span> */}
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                     {slide.title}
                   </h1>
@@ -126,53 +133,6 @@ const HeroBanner = () => {
                     <span className="text-3xl font-bold text-white/70">{currentSlide + 1}</span>
                     <span className="mx-2 text-white/50">/</span>
                     <span className="text-xl text-white/50">{slides.length}</span>
-                  </div>
-                </div>
-                
-                <div className={`flex justify-center transition-all duration-700 transform 
-                  ${index === currentSlide ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'}`}
-                  style={{ transitionDelay: '500ms' }}
-                >
-                  <div className="relative">
-                    {/* Slide image with effects */}
-                    <div className="absolute -inset-0.5 bg-white/20 rounded-xl blur-md"></div>
-                    <div className="relative rounded-xl shadow-2xl border border-white/10 overflow-hidden group">
-                      <img 
-                        src={slide.image} 
-                        alt="Factory Maintenance Dashboard" 
-                        className="relative w-full h-full object-cover transform transition-transform duration-7000 group-hover:scale-[1.02]"
-                      />
-                      
-                      {/* Image overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-70"></div>
-                      
-                      {/* Image content */}
-                      <div className="absolute bottom-0 left-0 right-0 p-6 transform transition-transform duration-500 translate-y-2 group-hover:translate-y-0">
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 rounded-full bg-[#FF5E14] mr-2 animate-pulse"></div>
-                          <span className="text-white/90 text-sm">Live dashboard preview</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Decorative elements */}
-                    <div className="absolute -top-8 -right-8 w-32 h-32 bg-[#FF5E14]/30 rounded-full blur-xl"></div>
-                    <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-[#02245B]/40 rounded-full blur-lg"></div>
-                    
-                    {/* Floating badges */}
-                    <div className="absolute -top-4 -left-4 bg-white shadow-lg rounded-lg px-3 py-2 flex items-center animate-bounce-slow">
-                      <svg className="w-5 h-5 text-[#FF5E14] mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                      </svg>
-                      <span className="text-xs font-bold text-gray-800">Easy to Use</span>
-                    </div>
-                    
-                    <div className="absolute bottom-10 -right-5 bg-[#02245B] shadow-lg rounded-lg px-3 py-2 flex items-center animate-pulse-slow">
-                      <svg className="w-5 h-5 text-white mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                      </svg>
-                      <span className="text-xs font-bold text-white">Real-time Data</span>
-                    </div>
                   </div>
                 </div>
               </div>

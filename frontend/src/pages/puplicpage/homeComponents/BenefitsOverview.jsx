@@ -45,7 +45,7 @@ const BenefitsOverview = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
           {userBenefits.map((item, index) => (
             <div key={index} className="rounded-lg overflow-hidden shadow-md">
               <div className={`${item.color} text-white p-6`}>

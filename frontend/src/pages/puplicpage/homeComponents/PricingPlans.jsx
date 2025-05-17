@@ -10,10 +10,11 @@ const PricingPlans = () => {
       duration: '7 days',
       features: [
         'Full access to all features',
-        'Up to 5 users',
-        'Technical support',
+        'Unlimited users',
+        'Priority technical support',
         'Unlimited work orders',
-        'All dashboard features'
+        'All dashboard features',
+        'Data export capabilities'
       ],
       isFeatured: false,
       buttonText: 'Start Free Trial',
@@ -63,12 +64,12 @@ const PricingPlans = () => {
             Choose the plan that works best for your maintenance needs.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {plans.map((plan, index) => (
             <div 
               key={index} 
-              className={`rounded-lg overflow-hidden transition-transform duration-300 hover:-translate-y-2 ${
+              className={`flex flex-col justify-between h-full rounded-lg overflow-hidden transition-transform duration-300 hover:-translate-y-2 ${
                 plan.isFeatured 
                   ? 'bg-white shadow-xl border-t-4 border-[#FF5E14] relative transform scale-105 z-10' 
                   : 'bg-white shadow-md'
@@ -79,15 +80,15 @@ const PricingPlans = () => {
                   MOST POPULAR
                 </div>
               )}
-              
-              <div className="p-6 text-center">
+
+              <div className="p-6 flex flex-col grow text-center">
                 <h3 className="text-xl font-bold mb-2 text-[#02245B]">{plan.name}</h3>
-                
+
                 <div className="my-6">
                   <span className="text-4xl font-bold text-[#02245B]">${plan.price}</span>
                   <span className="text-[#5F656F]">/{plan.duration}</span>
                 </div>
-                
+
                 <ul className="space-y-3 mb-8 text-left">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start">
@@ -98,17 +99,19 @@ const PricingPlans = () => {
                     </li>
                   ))}
                 </ul>
-                
-                <Link 
-                  to={plan.buttonLink} 
-                  className={`block w-full py-3 px-6 rounded-lg font-bold text-center transition ${
-                    plan.isFeatured 
-                      ? 'bg-[#FF5E14] hover:bg-[#e65512] text-white' 
-                      : 'bg-white border-2 border-[#FF5E14] text-[#FF5E14] hover:bg-[#FF5E14]/5'
-                  }`}
-                >
-                  {plan.buttonText}
-                </Link>
+
+                <div className="mt-auto">
+                  <Link 
+                    to={plan.buttonLink} 
+                    className={`block w-full py-3 px-6 rounded-lg font-bold text-center transition ${
+                      plan.isFeatured 
+                        ? 'bg-[#FF5E14] hover:bg-[#e65512] text-white' 
+                        : 'bg-white border-2 border-[#FF5E14] text-[#FF5E14] hover:bg-[#FF5E14]/5'
+                    }`}
+                  >
+                    {plan.buttonText}
+                  </Link>
+                </div>
               </div>
             </div>
           ))}

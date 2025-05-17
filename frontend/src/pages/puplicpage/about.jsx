@@ -1,6 +1,6 @@
 import React from 'react';
-import { FaTools, FaChartLine, FaClock, FaUsers, FaMapMarkedAlt, FaCheckCircle } from 'react-icons/fa';
-
+import { FaTools, FaClock, FaChartLine, FaUsers, FaMapMarkedAlt, FaCheckCircle, FaCogs, FaShieldAlt } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 const AboutUs = () => {
   return (
     <div className="bg-white min-h-screen">
@@ -8,13 +8,17 @@ const AboutUs = () => {
       <div className="bg-[#02245B] text-white py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Transforming Industrial Maintenance</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">Transforming Industrial System</h1>
             <p className="text-xl opacity-90 mb-10">
               Your trusted partner in streamlining factory operations and maintenance workflows.
             </p>
-            <button className="bg-[#FF5E14] text-white px-8 py-3 rounded-md font-semibold hover:bg-opacity-90 transition duration-300">
-              Start Free Trial
-            </button>
+           
+          <Link
+  to="/register"
+  className="bg-[#FF5E14] text-white px-8 py-3 rounded-md font-semibold hover:bg-opacity-90 transition duration-300 inline-block"
+>
+  Start Free Trial
+</Link>
           </div>
         </div>
       </div>
@@ -25,55 +29,55 @@ const AboutUs = () => {
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-[#02245B] mb-6">Our Mission</h2>
             <p className="text-[#5F656F] text-lg leading-relaxed">
-              We are dedicated to revolutionizing industrial maintenance management through innovative 
-              technology solutions. Our comprehensive platform empowers factories and industrial facilities 
-              to optimize their maintenance processes, reduce downtime, and extend equipment lifespan, 
-              resulting in significant cost savings and improved operational efficiency.
+             We are committed to transforming industrial maintenance through cutting-edge technology solutions. Our all-in-one platform enables factories and industrial facilities to streamline their maintenance operations, minimize downtime, and extend equipment lifespan — leading to substantial cost savings and improved operational performance.
+
+Beyond maintenance, our solution empowers industrial establishments to enhance productivity, ensure product quality, optimize resource efficiency, and comply with industry standards. By driving smarter operations, we help manufacturers reach peak performance and achieve sustainable growth.
+
             </p>
           </div>
         </div>
       </div>
 
       {/* Key Features */}
-      <div className="py-16">
+      <div className="py-16 mx-24">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-[#02245B] mb-12">What Sets Us Apart</h2>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard 
-              icon={<FaTools className="text-[#FF5E14] text-4xl" />}
-              title="Comprehensive Work Order Management"
-              description="Efficiently create, assign, and track maintenance tasks from start to finish with our intuitive system."
+            icon={<FaTools className="text-[#FF5E14] text-4xl" />}
+  title="Smart Work Order Management"
+  description="Streamline task creation, assignment, and completion with intelligent automation and real-time tracking."
             />
             
             <FeatureCard 
-              icon={<FaClock className="text-[#FF5E14] text-4xl" />}
-              title="Preventive Maintenance"
-              description="Reduce costly breakdowns by scheduling and automating preventive maintenance activities."
+           icon={<FaClock className="text-[#FF5E14] text-4xl" />}
+  title="Preventive Maintenance Scheduling"
+  description="Prevent unplanned downtimes by automating preventive maintenance activities across assets."
             />
             
             <FeatureCard 
-              icon={<FaChartLine className="text-[#FF5E14] text-4xl" />}
-              title="Advanced Analytics"
-              description="Gain valuable insights with detailed reports and analytics to optimize your maintenance operations."
+icon={<FaChartLine className="text-[#FF5E14] text-4xl" />}
+  title="Performance & Productivity Analytics"
+  description="Monitor asset performance and workforce productivity with actionable insights and KPIs."
             />
             
             <FeatureCard 
-              icon={<FaUsers className="text-[#FF5E14] text-4xl" />}
-              title="Role-Based Access"
-              description="Tailor system access based on employee roles for optimal workflow and security."
+              icon={<FaCogs className="text-[#FF5E14] text-4xl" />}
+  title="Production Efficiency Optimization"
+  description="Reduce bottlenecks and increase production throughput by integrating maintenance with operations."
             />
             
             <FeatureCard 
-              icon={<FaMapMarkedAlt className="text-[#FF5E14] text-4xl" />}
-              title="Multi-Location Support"
-              description="Easily manage maintenance across multiple facilities from a single platform."
+            icon={<FaShieldAlt className="text-[#FF5E14] text-4xl" />}
+  title="Quality Control & Compliance"
+  description="Ensure consistent product quality and meet industry standards with built-in quality assurance tools."
             />
             
             <FeatureCard 
-              icon={<FaCheckCircle className="text-[#FF5E14] text-4xl" />}
-              title="Quality Assurance"
-              description="Ensure maintenance tasks meet quality standards with built-in verification procedures."
+                icon={<FaMapMarkedAlt className="text-[#FF5E14] text-4xl" />}
+  title="Multi-Site Coordination"
+  description="Oversee maintenance and production operations across multiple sites from a centralized dashboard."
             />
           </div>
         </div>
@@ -87,23 +91,20 @@ const AboutUs = () => {
               <div>
                 <h2 className="text-3xl font-bold text-[#02245B] mb-6">Our Story</h2>
                 <p className="text-[#5F656F] mb-4 leading-relaxed">
-                  Founded in 2020 by a team of industrial maintenance experts and software engineers, our platform 
-                  was born from firsthand experience with the challenges of factory maintenance management.
+                  Established in 2025 by a visionary team of industrial maintenance professionals and software engineers, our platform emerged from real-world challenges faced inside factories and production environments.
+
                 </p>
                 <p className="text-[#5F656F] mb-4 leading-relaxed">
-                  We recognized that many facilities were struggling with inefficient paper-based systems or using 
-                  software not specifically designed for industrial maintenance. This led to delays, miscommunication, 
-                  and costly downtime.
+                 We witnessed how outdated paper-based systems and generic software tools led to inefficiencies, miscommunication, and costly downtime. Determined to change this, we set out to build a purpose-driven solution tailored specifically for the industrial sector.
+
                 </p>
                 <p className="text-[#5F656F] leading-relaxed">
-                  Our solution combines deep industry knowledge with cutting-edge technology to create a platform 
-                  that addresses the unique needs of factory maintenance teams. Today, we serve clients across 
-                  various industrial sectors, helping them achieve operational excellence.
+             By blending deep operational expertise with innovative technologies, we created a platform that not only simplifies maintenance management, but also enhances productivity, quality, and overall plant efficiency. Today, our solution supports factories across diverse industries in their journey toward smarter operations and sustainable growth.
                 </p>
               </div>
               <div className="rounded-lg overflow-hidden shadow-xl">
                 <img 
-                  src="/images/factory-team.jpg" 
+                  src="factory-team.webp" 
                   alt="Our team in a factory setting" 
                   className="w-full h-auto"
                   onError={(e) => {
@@ -116,39 +117,9 @@ const AboutUs = () => {
           </div>
         </div>
       </div>
-
-      {/* Testimonials */}
-      <div className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-[#02245B] mb-12">What Our Clients Say</h2>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <TestimonialCard 
-              quote="This platform has revolutionized how we manage maintenance. We've reduced downtime by 35% in just six months."
-              author="John Smith"
-              position="Maintenance Manager"
-              company="Acme Manufacturing"
-            />
-            
-            <TestimonialCard 
-              quote="The preventive maintenance features alone have saved us thousands in potential equipment failures."
-              author="Sarah Johnson"
-              position="Operations Director"
-              company="Global Industries"
-            />
-            
-            <TestimonialCard 
-              quote="Easy to implement and user-friendly. Our technicians adapted quickly and now can't imagine working without it."
-              author="Robert Chen"
-              position="Technical Supervisor"
-              company="Precision Engineering"
-            />
-          </div>
-        </div>
-      </div>
-
+      
       {/* Call to Action */}
-      <div className="bg-[#02245B] text-white py-16">
+      <div className="bg-[#173A6F] text-white py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Maintenance Operations?</h2>
@@ -156,12 +127,21 @@ const AboutUs = () => {
               Join hundreds of industrial facilities that have revolutionized their maintenance management.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <button className="bg-[#FF5E14] text-white px-8 py-3 rounded-md font-semibold hover:bg-opacity-90 transition duration-300">
-                Start 7-Day Free Trial
-              </button>
-              <button className="border-2 border-white text-white px-8 py-3 rounded-md font-semibold hover:bg-white hover:text-[#02245B] transition duration-300">
-                Schedule a Demo
-              </button>
+           
+<Link
+  to="/register"
+  className="bg-[#FF5E14] text-white px-8 py-3 rounded-md font-semibold hover:bg-opacity-90 transition duration-300 inline-block"
+>
+  Start 7-Day Free Trial
+</Link>
+        
+<Link
+  to="/services#contact-section"
+  className="border-2 border-white text-white px-8 py-3 rounded-md font-semibold hover:bg-white hover:text-[#02245B] transition duration-300 inline-block"
+>
+  Schedule a Demo
+</Link>
+      
             </div>
           </div>
         </div>

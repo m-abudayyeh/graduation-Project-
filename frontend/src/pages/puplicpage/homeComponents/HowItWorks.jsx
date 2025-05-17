@@ -39,7 +39,7 @@ const HowItWorks = () => {
           {/* Connection line */}
           <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-[#F5F5F5] -translate-x-1/2 z-0"></div>
           
-          <div className="space-y-12 relative z-10">
+          <div className="space-y-12 relative z-10 mx-24">
             {steps.map((step, index) => (
               <div 
                 key={index} 
