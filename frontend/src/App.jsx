@@ -1,21 +1,22 @@
-// src/App.jsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
-// Import layouts
+// Layouts
 import PublicLayout from './components/PublicLayout';
 
-// Import pages
+// Public Pages
 import Home from './pages/puplicpage/Home';
 import AboutUs from './pages/puplicpage/about';
 import ContactPage from './pages/puplicpage/contact';
+import ServicesPage from './pages/puplicpage/ServicesPage';
+
+// Auth Pages
 import Login from './pages/Authpages/login';
 import Register from './pages/Authpages/register';
-import ServicesPage from './pages/puplicpage/ServicesPage';
 import ResetPasswordPage from './pages/Authpages/ResetPasswordPage';
 import ForgotPasswordPage from './pages/Authpages/ForgotPasswordPage';
 
-// Import dashboard components
+// Main Dashboard (for company users)
 import MainDashboard from './pages/maindashborad/maindashborad';
 import DashboardHome from './pages/maindashborad/DashboardHome';
 import WorkOrders from './pages/maindashborad/WorkOrders';
@@ -30,44 +31,43 @@ import Vendors from './pages/maindashborad/Vendors';
 import Employees from './pages/maindashborad/Employees';
 import Subscription from './pages/maindashborad/Subscription';
 
-// Import subscription pages
+// Subscription flow
 import SubscriptionSuccess from './pages/SubscriptionSuccess';
 import SubscriptionCancel from './pages/SubscriptionCancel';
 import SubscriptionRenew from './pages/SubscriptionRenew';
 
-// Import admin dashboard components
+// Admin Dashboard
 import AdminDashboard from './pages/admindashoard/AdminDashboard';
 import AdminDashboardHome from './pages/admindashoard/AdminDashboardHome';
 import Users from './pages/admindashoard/Users';
-import Settings from './pages/admindashoard/Settings';
-import Reports from './pages/admindashoard/Reports';
-
+import Massege from './pages/admindashoard/massege';
+import CustomSolutionsMassege from './pages/admindashoard/CustomSolutionsMassege';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Public routes with Navbar */}
+
+        {/* Public routes with layout */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactPage />} />
-            <Route path="/services" element={<ServicesPage />} />
+          <Route path="/services" element={<ServicesPage />} />
         </Route>
 
         {/* Auth routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
-         
-        {/* Subscription redirect pages (outside of dashboard layout) */}
+        {/* Subscription redirect pages (outside dashboards) */}
         <Route path="/dashboard/subscription/success" element={<SubscriptionSuccess />} />
         <Route path="/dashboard/subscription/cancel" element={<SubscriptionCancel />} />
         <Route path="/dashboard/subscription/renew" element={<SubscriptionRenew />} />
 
-        {/* Dashboard routes - without Navbar */}
+        {/* Main Dashboard Routes */}
         <Route path="/dashboard" element={<MainDashboard />}>
           <Route index element={<DashboardHome />} />
           <Route path="work-orders" element={<WorkOrders />} />
@@ -82,16 +82,16 @@ function App() {
           <Route path="employees" element={<Employees />} />
           <Route path="subscription" element={<Subscription />} />
         </Route>
-        
-        {/* Admin Dashboard routes */}
+
+        {/* Admin Dashboard Routes */}
         <Route path="/admin" element={<AdminDashboard />}>
           <Route index element={<AdminDashboardHome />} />
           <Route path="users" element={<Users />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="reports" element={<Reports />} />
+          <Route path="massege" element={<Massege />} />
+          <Route path="customSolutionsMassege" element={<CustomSolutionsMassege />} />
         </Route>
-        
-        {/* Redirect unknown routes to home */}
+
+        {/* Fallback: redirect to home if route not found */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
