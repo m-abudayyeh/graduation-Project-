@@ -1,5 +1,5 @@
 // src/pages/maindashborad/WorkOrders/WorkOrderImagesSection.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Alert from './Alert';
 
@@ -10,47 +10,74 @@ const WorkOrderImagesSection = ({ workOrder }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [showImageUploadForm, setShowImageUploadForm] = useState(false);
   const [expandedImage, setExpandedImage] = useState(null);
-  
+  const [images, setImages] = useState(workOrder?.images || []);
+
+  // Reset success message after delay
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  // Handle ESC to close expanded image
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setExpandedImage(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Handle file selection
   const handleFileChange = (e) => {
     if (e.target.files) {
-      setSelectedFiles(Array.from(e.target.files));
+      const files = Array.from(e.target.files);
+
+      const oversized = files.filter(file => file.size > 5 * 1024 * 1024);
+      if (oversized.length > 0) {
+        setError('Each file must be 5MB or less.');
+        return;
+      }
+
+      if (files.length > 5) {
+        setError('You can upload up to 5 images at a time.');
+        return;
+      }
+
+      setSelectedFiles(files);
     }
   };
-  
+
   // Upload images
   const handleUploadImages = async (e) => {
     e.preventDefault();
-    
+
     if (selectedFiles.length === 0) {
       setError('Please select at least one image to upload');
       return;
     }
-    
+
     setLoading(true);
     setError(null);
-    
+
     const formData = new FormData();
     selectedFiles.forEach(file => {
       formData.append('images', file);
     });
-    
+
     try {
-      const response = await axios.post(`/api/work-orders/${workOrder.id}/images`, formData, {
+      const response = await axios.post(`http://localhost:5000/api/work-orders/${workOrder.id}/images`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      
+
       if (response.data && response.data.data) {
         setSuccess('Images uploaded successfully');
         setSelectedFiles([]);
         setShowImageUploadForm(false);
-        
-        // Update the work order images in parent component
-        if (workOrder) {
-          workOrder.images = response.data.data.images || [];
-        }
+        setImages(response.data.data.images || []);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Error uploading images');
@@ -59,7 +86,7 @@ const WorkOrderImagesSection = ({ workOrder }) => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -74,10 +101,10 @@ const WorkOrderImagesSection = ({ workOrder }) => {
           {showImageUploadForm ? 'Cancel' : 'Upload Images'}
         </button>
       </div>
-      
+
       {error && <Alert type="error" message={error} onClose={() => setError(null)} />}
       {success && <Alert type="success" message={success} onClose={() => setSuccess(null)} />}
-      
+
       {/* Image Upload Form */}
       {showImageUploadForm && (
         <div className="mb-4 bg-gray-50 p-4 rounded-md">
@@ -95,7 +122,7 @@ const WorkOrderImagesSection = ({ workOrder }) => {
                 required
               />
             </div>
-            
+
             {selectedFiles.length > 0 && (
               <div className="mb-3">
                 <p className="text-sm text-gray-500 mb-2">Selected Files:</p>
@@ -108,7 +135,7 @@ const WorkOrderImagesSection = ({ workOrder }) => {
                 </ul>
               </div>
             )}
-            
+
             <div className="flex justify-end">
               <button
                 type="submit"
@@ -126,11 +153,11 @@ const WorkOrderImagesSection = ({ workOrder }) => {
           </form>
         </div>
       )}
-      
+
       {/* Images Gallery */}
-      {workOrder.images && workOrder.images.length > 0 ? (
+      {images.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {workOrder.images.map((image, index) => (
+          {images.map((image, index) => (
             <div key={index} className="group relative">
               <img
                 src={image}
@@ -147,7 +174,7 @@ const WorkOrderImagesSection = ({ workOrder }) => {
           No images uploaded for this work order yet.
         </div>
       )}
-      
+
       {/* Image Modal */}
       {expandedImage && (
         <div 

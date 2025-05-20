@@ -28,7 +28,6 @@ const Login = () => {
     setError(null);
     
     try {
-      // تكوين axios لإرسال واستقبال الكوكيز
       axios.defaults.withCredentials = true;
       
       // Make the login request to your backend
@@ -39,11 +38,11 @@ const Login = () => {
       
       // Check if we have a successful response with user data
       if (response.data && response.data.data && response.data.data.user) {
-        // تخزين بيانات المستخدم فقط (لاحظ أننا لم نعد نخزن التوكن)
+   
         const storage = formData.rememberMe ? localStorage : sessionStorage;
         storage.setItem('user', JSON.stringify(response.data.data.user));
         
-        // يمكنك أيضًا تخزين حالة تذكرني إذا أردت استخدامها لاحقًا
+       
         if (formData.rememberMe) {
           localStorage.setItem('rememberMe', 'true');
         } else {

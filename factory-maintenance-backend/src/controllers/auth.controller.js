@@ -222,13 +222,25 @@ exports.resetPassword = async (req, res, next) => {
     const { newPassword } = req.body;
     const hashedToken = jwtUtils.hashToken(token);
 
-    // Find user with valid token
-    const user = await User.findOne({
-      where: {
-        passwordResetToken: hashedToken,
-        passwordResetExpires: { $gt: new Date() }
-      }
-    });
+    // // Find user with valid token
+    // const user = await User.findOne({
+    //   where: {
+    //     passwordResetToken: hashedToken,
+    //     passwordResetExpires: { $gt: new Date() }
+    //   }
+    // });
+
+    const { Op } = require('sequelize');
+
+const user = await User.findOne({
+  where: {
+    passwordResetToken: hashedToken,
+    passwordResetExpires: {
+      [Op.gt]: new Date()
+    }
+  }
+});
+
 
     if (!user) {
       return responseHandler.error(res, 400, 'Invalid or expired reset token');

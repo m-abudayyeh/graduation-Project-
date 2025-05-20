@@ -4,15 +4,14 @@ import axios from 'axios';
 import Alert from './Alert';
 
 const WorkOrderPartsSection = ({ workOrder }) => {
-  const [loading, setLoading] = useState(false);
+  const [loadingAction, setLoadingAction] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [storeParts, setStoreParts] = useState([]);
   const [selectedPart, setSelectedPart] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [showAddPartForm, setShowAddPartForm] = useState(false);
-  
-  // External parts state
+
   const [showAddExternalPartForm, setShowAddExternalPartForm] = useState(false);
   const [externalPart, setExternalPart] = useState({
     name: '',
@@ -22,154 +21,114 @@ const WorkOrderPartsSection = ({ workOrder }) => {
     supplier: '',
     notes: ''
   });
-  
-  // Fetch available parts for dropdown
+
+  const [internalParts, setInternalParts] = useState(workOrder.parts || []);
+  const [externalParts, setExternalParts] = useState(workOrder.externalParts || []);
+
   useEffect(() => {
     const fetchStoreParts = async () => {
       try {
-        const response = await axios.get('/api/store-parts');
-        if (response.data && response.data.data) {
-          setStoreParts(response.data.data.rows || []);
+        const response = await axios.get('http://localhost:5000/api/store-parts');
+        if (response.data?.data?.items) {
+          setStoreParts(response.data.data.items);
         }
       } catch (err) {
         console.error('Error fetching store parts:', err);
       }
     };
-    
+
     if (showAddPartForm) {
       fetchStoreParts();
     }
   }, [showAddPartForm]);
-  
-  // Add a part from inventory
+
   const handleAddPart = async (e) => {
     e.preventDefault();
-    
-    if (!selectedPart) {
-      setError('Please select a part');
+    if (!selectedPart || quantity <= 0) {
+      setError('Please select a part and enter valid quantity');
       return;
     }
-    
-    if (quantity <= 0) {
-      setError('Quantity must be greater than zero');
-      return;
-    }
-    
-    setLoading(true);
+    setLoadingAction(true);
     setError(null);
-    
+
     try {
-      const response = await axios.post(`/api/work-orders/${workOrder.id}/parts`, {
+      const response = await axios.post(`http://localhost:5000/api/work-orders/${workOrder.id}/parts`, {
         parts: [{ storePartId: selectedPart, quantity }]
       });
-      
-      if (response.data && response.data.data) {
+
+      if (response.data?.data) {
         setSuccess('Part added successfully');
+        const updated = response.data.data;
+        const newParts = [...internalParts];
+        updated.forEach((updatedPart) => {
+          const index = newParts.findIndex(p => p.id === updatedPart.id);
+          if (index >= 0) {
+            newParts[index].WorkOrderParts.quantity += quantity;
+          } else {
+            updatedPart.WorkOrderParts = { quantity };
+            newParts.push(updatedPart);
+          }
+        });
+        setInternalParts(newParts);
         setSelectedPart('');
         setQuantity(1);
         setShowAddPartForm(false);
-        
-        // Update the work order parts in parent component
-        if (workOrder.parts) {
-          const updatedPart = response.data.data.find(part => part.id === parseInt(selectedPart));
-          if (updatedPart) {
-            const existingPartIndex = workOrder.parts.findIndex(part => part.id === updatedPart.id);
-            
-            if (existingPartIndex >= 0) {
-              workOrder.parts[existingPartIndex].WorkOrderParts.quantity += quantity;
-            } else {
-              updatedPart.WorkOrderParts = { quantity };
-              workOrder.parts.push(updatedPart);
-            }
-          }
-        }
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Error adding part');
-      console.error('Error adding part:', err);
     } finally {
-      setLoading(false);
+      setLoadingAction(false);
     }
   };
-  
-  // Remove a part
+
   const handleRemovePart = async (partId) => {
-    setLoading(true);
+    setLoadingAction(true);
     setError(null);
-    
     try {
-      await axios.delete(`/api/work-orders/${workOrder.id}/parts/${partId}`);
-      
+      await axios.delete(`http://localhost:5000/api/work-orders/${workOrder.id}/parts/${partId}`);
       setSuccess('Part removed successfully');
-      
-      // Update the work order parts in parent component
-      if (workOrder.parts) {
-        workOrder.parts = workOrder.parts.filter(part => part.id !== partId);
-      }
+      setInternalParts(internalParts.filter(part => part.id !== partId));
     } catch (err) {
       setError(err.response?.data?.message || 'Error removing part');
-      console.error('Error removing part:', err);
     } finally {
-      setLoading(false);
+      setLoadingAction(false);
     }
   };
-  
-  // Add an external part
+
   const handleAddExternalPart = async (e) => {
     e.preventDefault();
-    
-    if (!externalPart.name) {
-      setError('Part name is required');
+    if (!externalPart.name || externalPart.quantity <= 0) {
+      setError('Name and valid quantity are required');
       return;
     }
-    
-    if (externalPart.quantity <= 0) {
-      setError('Quantity must be greater than zero');
-      return;
-    }
-    
-    setLoading(true);
+    setLoadingAction(true);
     setError(null);
-    
+
     try {
-      const response = await axios.post(`/api/work-orders/${workOrder.id}/external-parts`, {
+      const response = await axios.post(`http://localhost:5000/api/work-orders/${workOrder.id}/external-parts`, {
         externalParts: [externalPart]
       });
-      
-      if (response.data && response.data.data) {
+
+      if (response.data?.data) {
         setSuccess('External part added successfully');
+        setExternalParts(response.data.data);
         setExternalPart({
-          name: '',
-          partNumber: '',
-          quantity: 1,
-          cost: '',
-          supplier: '',
-          notes: ''
+          name: '', partNumber: '', quantity: 1, cost: '', supplier: '', notes: ''
         });
         setShowAddExternalPartForm(false);
-        
-        // Update the work order external parts in parent component
-        if (workOrder.externalParts) {
-          workOrder.externalParts = response.data.data;
-        }
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Error adding external part');
-      console.error('Error adding external part:', err);
     } finally {
-      setLoading(false);
+      setLoadingAction(false);
     }
   };
-  
-  // Handle external part input changes
+
   const handleExternalPartChange = (e) => {
     const { name, value } = e.target;
-    setExternalPart(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setExternalPart(prev => ({ ...prev, [name]: value }));
   };
-  
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">

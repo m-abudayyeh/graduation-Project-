@@ -19,7 +19,7 @@ const WorkOrderList = ({
   onViewColumns 
 }) => {
   const navigate = useNavigate();
-  
+
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -40,7 +40,7 @@ const WorkOrderList = ({
             </svg>
             New Work Order
           </button>
-          
+
           <button
             onClick={onViewDeleted}
             className="bg-[#5F656F] hover:bg-[#4a4f57] text-white px-4 py-2 rounded-md"
@@ -48,7 +48,7 @@ const WorkOrderList = ({
             Deleted
           </button>
         </div>
-        
+
         <div className="flex space-x-2">
           <button
             onClick={onViewCalendar}
@@ -59,7 +59,7 @@ const WorkOrderList = ({
             </svg>
             Calendar
           </button>
-          
+
           <button
             onClick={onViewColumns}
             className="bg-[#02245B] hover:bg-[#021d4a] text-white px-4 py-2 rounded-md flex items-center"
@@ -71,7 +71,7 @@ const WorkOrderList = ({
           </button>
         </div>
       </div>
-      
+
       <div className="mb-4">
         <SearchBar 
           value={filters.search} 
@@ -79,14 +79,14 @@ const WorkOrderList = ({
           placeholder="Search work orders..." 
         />
       </div>
-      
+
       <div className="mb-4">
         <FilterOptions 
           filters={filters} 
           onChange={onFilterChange} 
         />
       </div>
-      
+
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -180,12 +180,12 @@ const WorkOrderList = ({
           </tbody>
         </table>
       </div>
-      
+
       <div className="mt-4">
         <Pagination 
           currentPage={filters.page} 
           onPageChange={onPageChange} 
-          totalPages={Math.ceil(workOrders.length / filters.limit)} 
+          totalPages={filters.totalPages || 1} 
         />
       </div>
     </div>

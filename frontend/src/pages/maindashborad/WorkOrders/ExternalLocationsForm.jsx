@@ -82,7 +82,7 @@ const ExternalLocationsForm = ({ workOrderId, onExternalLocationsAdded }) => {
     setError(null);
     
     try {
-      const response = await axios.post(`/api/work-orders/${workOrderId}/external-locations`, {
+      const response = await axios.post(`http://localhost:5000/api/work-orders/${workOrderId}/external-locations`, {
         externalLocations: locationsToSubmit
       });
       

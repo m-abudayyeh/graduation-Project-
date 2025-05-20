@@ -12,6 +12,8 @@ import ContactPage from './pages/puplicpage/contact';
 import Login from './pages/Authpages/login';
 import Register from './pages/Authpages/register';
 import ServicesPage from './pages/puplicpage/ServicesPage';
+import ResetPasswordPage from './pages/Authpages/ResetPasswordPage';
+import ForgotPasswordPage from './pages/Authpages/ForgotPasswordPage';
 
 // Import dashboard components
 import MainDashboard from './pages/maindashborad/maindashborad';
@@ -56,7 +58,10 @@ function App() {
         {/* Auth routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
+         
         {/* Subscription redirect pages (outside of dashboard layout) */}
         <Route path="/dashboard/subscription/success" element={<SubscriptionSuccess />} />
         <Route path="/dashboard/subscription/cancel" element={<SubscriptionCancel />} />

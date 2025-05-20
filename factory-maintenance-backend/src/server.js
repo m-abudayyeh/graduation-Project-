@@ -13,7 +13,6 @@ const errorHandler = require('./middlewares/errorHandler');
 // Create Express app
 const app = express();
 
-// 1️⃣ Webhook أول شيء قبل أي middleware ثاني
 app.post('/api/subscriptions/webhook', express.raw({ type: 'application/json' }), 
   require('./controllers/subscription.controller').handleWebhook);
 
@@ -76,8 +75,8 @@ db.sequelize.authenticate()
  })
  .catch(err => {
    console.error('Unable to connect to the database:', err);
-   process.exit(1); // Exit application if database connection fails
+   process.exit(1); 
  });
 
 
-module.exports = app; // Export for testing purposes if needed
+module.exports = app; 

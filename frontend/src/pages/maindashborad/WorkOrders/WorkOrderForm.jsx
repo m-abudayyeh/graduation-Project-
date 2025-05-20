@@ -59,23 +59,37 @@ const WorkOrderForm = ({ workOrder, onSubmit, onCancel }) => {
           withCredentials: true,
         });
     
-        console.log('📦 Locations:', response.data.data.items);
+        // console.log(' Locations:', response.data.data.items);
     
         if (response.data?.data?.items) {
           setLocations(response.data.data.items);
         }
         
+
+
         // Fetch equipment
-        const equipmentResponse = await axios.get('/api/equipment');
-        if (equipmentResponse.data && equipmentResponse.data.data) {
-          setEquipment(equipmentResponse.data.data.rows || []);
-        }
-        
+const equipmentResponse = await axios.get(`${API_URL}/equipment`, {
+  withCredentials: true
+});if (equipmentResponse.data && equipmentResponse.data.data) {
+  setEquipment(equipmentResponse.data.data.items|| []);
+}
+// console.log(equipmentResponse.data.data.items);
+
+
+
+
         // Fetch users
-        const usersResponse = await axios.get('/api/users');
-        if (usersResponse.data && usersResponse.data.data) {
-          setUsers(usersResponse.data.data.rows || []);
-        }
+const usersResponse = await axios.get(`${API_URL}/users`, {
+  withCredentials: true
+});
+
+if (usersResponse.data && usersResponse.data.data) {
+  setUsers(usersResponse.data.data.items || []);
+}
+
+// console.log(usersResponse.data);
+
+
         
         // If editing, populate form with work order data
         if (workOrder) {

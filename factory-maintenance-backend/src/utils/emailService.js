@@ -42,7 +42,7 @@ exports.sendEmail = async (options) => {
  * Send verification email
  */
 exports.sendVerificationEmail = async (user, token) => {
-  const verificationUrl = `${process.env.FRONTEND_URL}/api/auth/verify-email/${token}`;
+  const verificationUrl = `http://localhost:5000/api/auth/verify-email/${token}`;
   return this.sendEmail({
     to: user.email,
     subject: 'Email Verification - Factory Maintenance',
@@ -66,7 +66,7 @@ exports.sendVerificationEmail = async (user, token) => {
  * Send password reset email
  */
 exports.sendPasswordResetEmail = async (user, token) => {
-  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+  const resetUrl = `http://localhost:5173/reset-password/${token}`;
 
   return this.sendEmail({
     to: user.email,
