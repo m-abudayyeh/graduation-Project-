@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser'); 
 require('dotenv').config();
+const customSolutionsRoutes = require('./routes/customSolutionsRoutes');
 
 // Import database models
 const db = require('./models');
@@ -48,7 +49,7 @@ app.use('/api/subscriptions', require('./routes/subscription.routes'));
 app.use('/api/contact', require('./routes/contact.routes'));
 app.use('/api/faqs', require('./routes/faq.routes'));
 app.use('/api/statistics', require('./routes/statistics.routes'));
-
+app.use('/api', customSolutionsRoutes);
 // Health check endpoint
 app.get('/health', (req, res) => {
  res.status(200).json({ status: 'OK', message: 'Server is running' });

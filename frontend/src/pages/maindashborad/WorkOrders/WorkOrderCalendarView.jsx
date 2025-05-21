@@ -1,4 +1,3 @@
-// src/pages/maindashborad/WorkOrders/WorkOrderCalendarView.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
@@ -18,6 +17,9 @@ const WorkOrderCalendarView = ({ workOrders, onSelectWorkOrder }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // تحكم في العرض
+  const [calendarView, setCalendarView] = useState('month');
 
   useEffect(() => {
     if (workOrders?.length) {
@@ -74,24 +76,26 @@ const WorkOrderCalendarView = ({ workOrders, onSelectWorkOrder }) => {
     );
   };
 
-  const CustomToolbar = (toolbar) => {
-    const goTo = dir => toolbar.onNavigate(dir);
-    const viewBtn = (view) => (
+  const CustomToolbar = ({ date, view, onNavigate, onView }) => {
+    const goTo = (dir) => onNavigate(dir);
+
+    const viewBtn = (viewName) => (
       <button
-        onClick={() => toolbar.onView(view)}
+        key={viewName}
+        onClick={() => onView(viewName)}
         className={`inline-flex items-center px-3 py-2 border text-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#02245B] ${
-          toolbar.view === view
+          view === viewName
             ? 'border-[#02245B] text-white bg-[#02245B]'
             : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
         }`}
       >
-        {view.charAt(0).toUpperCase() + view.slice(1)}
+        {viewName.charAt(0).toUpperCase() + viewName.slice(1)}
       </button>
     );
 
     return (
       <div className="flex items-center justify-between mb-4">
-        <div className="text-lg font-semibold text-[#02245B]">{moment(toolbar.date).format('MMMM YYYY')}</div>
+        <div className="text-lg font-semibold text-[#02245B]">{moment(date).format('MMMM YYYY')}</div>
         <div className="flex space-x-2">
           <button onClick={() => goTo('PREV')} className="btn-nav">←</button>
           <button onClick={() => goTo('TODAY')} className="btn-nav">Today</button>
@@ -154,7 +158,8 @@ const WorkOrderCalendarView = ({ workOrders, onSelectWorkOrder }) => {
         endAccessor="end"
         style={{ height: 700 }}
         views={['month', 'week', 'day', 'agenda']}
-        defaultView="month"
+        view={calendarView}
+        onView={setCalendarView}
         components={{ event: EventComponent, toolbar: CustomToolbar }}
         eventPropGetter={eventStyleGetter}
         onSelectEvent={event => onSelectWorkOrder(event.id)}

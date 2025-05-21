@@ -6,6 +6,8 @@ const responseHandler = require('../utils/responseHandler');
 const { Op, Sequelize } = require('sequelize');
 const emailService = require('../utils/emailService');
 const notificationController = require('./notification.controller');
+const generateWorkOrderNumber = require('../utils/generateWorkOrderNumber');
+
 /**
  * Get all work orders for a company
  * @route GET /api/work-orders
@@ -158,45 +160,198 @@ exports.getWorkOrderById = async (req, res, next) => {
 };
 
 /**
- * توليد رقم تسلسلي للأمر
  * @param {*} companyId 
  */
-const generateWorkOrderNumber = async (companyId) => {
-  // الحصول على آخر رقم للأمر لهذه الشركة
-  const latestWorkOrder = await WorkOrder.findOne({
-    where: { companyId },
-    order: [['createdAt', 'DESC']]
-  });
 
-  const currentYear = new Date().getFullYear();
-  let sequentialNumber = 1;
 
-  if (latestWorkOrder && latestWorkOrder.workOrderNumber) {
-    // استخراج الرقم التسلسلي من آخر أمر
-    const match = latestWorkOrder.workOrderNumber.match(/WO-\d{4}-(\d+)/);
-    if (match && match[1]) {
-      sequentialNumber = parseInt(match[1]) + 1;
-    }
-  }
+// const generateWorkOrderNumber = async (companyId) => {
+//   const latestWorkOrder = await WorkOrder.findOne({
+//     where: { companyId },
+//     order: [['createdAt', 'DESC']]
+//   });
 
-  // تنسيق الرقم التسلسلي بأربعة أرقام على الأقل
-  return `WO-${currentYear}-${sequentialNumber.toString().padStart(4, '0')}`;
-};
+//   const currentYear = new Date().getFullYear();
+//   let sequentialNumber = 1;
+
+//   if (latestWorkOrder && latestWorkOrder.workOrderNumber) {
+//     const match = latestWorkOrder.workOrderNumber.match(/WO-\d{4}-(\d+)/);
+//     if (match && match[1]) {
+//       sequentialNumber = parseInt(match[1]) + 1;
+//     }
+//   }
+
+//   return `WO-${currentYear}-${sequentialNumber.toString().padStart(4, '0')}`;
+// };
 
 /**
  * Create new work order
  * @route POST /api/work-orders
  */
+// exports.createWorkOrder = async (req, res, next) => {
+//   try {
+//     const { companyId, role } = req.user;
+    
+//     // Only admin or supervisor can create work orders
+//     if (role !== 'admin' && role !== 'supervisor') {
+//       return responseHandler.error(res, 403, 'You do not have permission to create work orders');
+//     }
+    
+//     const { 
+//       title, description, category, priority,
+//       dueDate, startDate, equipmentId, locationId,
+//       primaryAssigneeId, secondaryAssigneeId,
+//       isPreventive, preventiveMaintenanceId, maintenanceRequestId,
+//       notes, externalParts, externalLocations, tags,
+//       estimatedCost, estimatedHours, solution
+//     } = req.body;
+    
+//     // Validate equipment belongs to company
+//     if (equipmentId) {
+//       const equipment = await Equipment.findOne({
+//         where: { id: equipmentId, companyId }
+//       });
+      
+//       if (!equipment) {
+//         return responseHandler.error(res, 404, 'Equipment not found');
+//       }
+//     }
+    
+//     // Validate location belongs to company
+//     if (locationId) {
+//       const location = await Location.findOne({
+//         where: { id: locationId, companyId }
+//       });
+      
+//       if (!location) {
+//         return responseHandler.error(res, 404, 'Location not found');
+//       }
+//     }
+    
+//     // Validate primary assignee belongs to company
+//     if (primaryAssigneeId) {
+//       const primaryAssignee = await User.findOne({
+//         where: { id: primaryAssigneeId, companyId }
+//       });
+      
+//       if (!primaryAssignee) {
+//         return responseHandler.error(res, 404, 'Primary assignee not found');
+//       }
+//     }
+    
+//     // Validate secondary assignee belongs to company
+//     if (secondaryAssigneeId) {
+//       const secondaryAssignee = await User.findOne({
+//         where: { id: secondaryAssigneeId, companyId }
+//       });
+      
+//       if (!secondaryAssignee) {
+//         return responseHandler.error(res, 404, 'Secondary assignee not found');
+//       }
+//     }
+    
+//     const workOrderNumber = await generateWorkOrderNumber(companyId);
+    
+//     // Create work order
+//     const workOrder = await WorkOrder.create({
+//       workOrderNumber,
+//       title,
+//       description,
+//       category,
+//       priority,
+//       dueDate,
+//       startDate,
+//       equipmentId,
+//       locationId,
+//       primaryAssigneeId,
+//       secondaryAssigneeId,
+//       isPreventive: !!isPreventive,
+//       preventiveMaintenanceId,
+//       maintenanceRequestId,
+//       notes,
+//       estimatedCost,
+//       estimatedHours,
+//       solution,
+//       externalParts: externalParts || [],
+//       externalLocations: externalLocations || [],
+//       tags: tags || [],
+//       status: 'open',
+//       companyId
+//     });
+    
+//     // Update maintenance request status if provided
+//     if (maintenanceRequestId) {
+//       await MaintenanceRequest.update(
+//         { status: 'converted_to_work_order' },
+//         { where: { id: maintenanceRequestId, companyId } }
+//       );
+//     }
+    
+//     // Fetch created work order with related entities
+//     const createdWorkOrder = await WorkOrder.findByPk(workOrder.id, {
+//       include: [
+//         { model: Equipment, as: 'equipment' },
+//         { model: Location, as: 'location' },
+//         { model: User, as: 'primaryAssignee', attributes: ['id', 'firstName', 'lastName', 'email'] },
+//         { model: User, as: 'secondaryAssignee', attributes: ['id', 'firstName', 'lastName', 'email'] }
+//       ]
+//     });
+    
+//     // Send notification to assignees
+//     if (primaryAssigneeId) {
+//       // Send email notification
+//       const primaryAssignee = await User.findByPk(primaryAssigneeId);
+//       if (primaryAssignee) {
+//         emailService.sendWorkOrderNotification(primaryAssignee, createdWorkOrder);
+        
+//         // Create in-app notification
+//         await notificationController.createNotification({
+//           type: 'new_task',
+//           title: 'New Work Order Assigned',
+//           message: `You have been assigned as primary on work order: ${title}`,
+//           userId: primaryAssigneeId,
+//           companyId,
+//           relatedId: workOrder.id,
+//           relatedType: 'WorkOrder'
+//         });
+//       }
+//     }
+    
+//     if (secondaryAssigneeId) {
+//       // Send email notification
+//       const secondaryAssignee = await User.findByPk(secondaryAssigneeId);
+//       if (secondaryAssignee) {
+//         emailService.sendWorkOrderNotification(secondaryAssignee, createdWorkOrder);
+        
+//         // Create in-app notification
+//         await notificationController.createNotification({
+//           type: 'new_task',
+//           title: 'New Work Order Assigned',
+//           message: `You have been assigned as secondary on work order: ${title}`,
+//           userId: secondaryAssigneeId,
+//           companyId,
+//           relatedId: workOrder.id,
+//           relatedType: 'WorkOrder'
+//         });
+//       }
+//     }
+    
+//     return responseHandler.success(res, 201, 'Work order created successfully', createdWorkOrder);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
 exports.createWorkOrder = async (req, res, next) => {
   try {
     const { companyId, role } = req.user;
-    
-    // Only admin or supervisor can create work orders
+
+    // التحقق من الصلاحيات
     if (role !== 'admin' && role !== 'supervisor') {
       return responseHandler.error(res, 403, 'You do not have permission to create work orders');
     }
-    
-    const { 
+
+    const {
       title, description, category, priority,
       dueDate, startDate, equipmentId, locationId,
       primaryAssigneeId, secondaryAssigneeId,
@@ -204,55 +359,35 @@ exports.createWorkOrder = async (req, res, next) => {
       notes, externalParts, externalLocations, tags,
       estimatedCost, estimatedHours, solution
     } = req.body;
-    
-    // Validate equipment belongs to company
+
+    // تحقق من المعدات
     if (equipmentId) {
-      const equipment = await Equipment.findOne({
-        where: { id: equipmentId, companyId }
-      });
-      
-      if (!equipment) {
-        return responseHandler.error(res, 404, 'Equipment not found');
-      }
+      const equipment = await Equipment.findOne({ where: { id: equipmentId, companyId } });
+      if (!equipment) return responseHandler.error(res, 404, 'Equipment not found');
     }
-    
-    // Validate location belongs to company
+
+    // تحقق من الموقع
     if (locationId) {
-      const location = await Location.findOne({
-        where: { id: locationId, companyId }
-      });
-      
-      if (!location) {
-        return responseHandler.error(res, 404, 'Location not found');
-      }
+      const location = await Location.findOne({ where: { id: locationId, companyId } });
+      if (!location) return responseHandler.error(res, 404, 'Location not found');
     }
-    
-    // Validate primary assignee belongs to company
+
+    // تحقق من الـ primary assignee
     if (primaryAssigneeId) {
-      const primaryAssignee = await User.findOne({
-        where: { id: primaryAssigneeId, companyId }
-      });
-      
-      if (!primaryAssignee) {
-        return responseHandler.error(res, 404, 'Primary assignee not found');
-      }
+      const primaryAssignee = await User.findOne({ where: { id: primaryAssigneeId, companyId } });
+      if (!primaryAssignee) return responseHandler.error(res, 404, 'Primary assignee not found');
     }
-    
-    // Validate secondary assignee belongs to company
+
+    // تحقق من الـ secondary assignee
     if (secondaryAssigneeId) {
-      const secondaryAssignee = await User.findOne({
-        where: { id: secondaryAssigneeId, companyId }
-      });
-      
-      if (!secondaryAssignee) {
-        return responseHandler.error(res, 404, 'Secondary assignee not found');
-      }
+      const secondaryAssignee = await User.findOne({ where: { id: secondaryAssigneeId, companyId } });
+      if (!secondaryAssignee) return responseHandler.error(res, 404, 'Secondary assignee not found');
     }
-    
-    // توليد رقم تسلسلي للأمر
+
+    // توليد رقم تسلسلي فريد
     const workOrderNumber = await generateWorkOrderNumber(companyId);
-    
-    // Create work order
+
+    // إنشاء أمر العمل
     const workOrder = await WorkOrder.create({
       workOrderNumber,
       title,
@@ -278,16 +413,16 @@ exports.createWorkOrder = async (req, res, next) => {
       status: 'open',
       companyId
     });
-    
-    // Update maintenance request status if provided
+
+    // تحديث حالة طلب الصيانة
     if (maintenanceRequestId) {
       await MaintenanceRequest.update(
         { status: 'converted_to_work_order' },
         { where: { id: maintenanceRequestId, companyId } }
       );
     }
-    
-    // Fetch created work order with related entities
+
+    // جلب أمر العمل مع العلاقات
     const createdWorkOrder = await WorkOrder.findByPk(workOrder.id, {
       include: [
         { model: Equipment, as: 'equipment' },
@@ -296,15 +431,12 @@ exports.createWorkOrder = async (req, res, next) => {
         { model: User, as: 'secondaryAssignee', attributes: ['id', 'firstName', 'lastName', 'email'] }
       ]
     });
-    
-    // Send notification to assignees
+
+    // إرسال إشعارات
     if (primaryAssigneeId) {
-      // Send email notification
       const primaryAssignee = await User.findByPk(primaryAssigneeId);
       if (primaryAssignee) {
         emailService.sendWorkOrderNotification(primaryAssignee, createdWorkOrder);
-        
-        // Create in-app notification
         await notificationController.createNotification({
           type: 'new_task',
           title: 'New Work Order Assigned',
@@ -316,14 +448,11 @@ exports.createWorkOrder = async (req, res, next) => {
         });
       }
     }
-    
+
     if (secondaryAssigneeId) {
-      // Send email notification
       const secondaryAssignee = await User.findByPk(secondaryAssigneeId);
       if (secondaryAssignee) {
         emailService.sendWorkOrderNotification(secondaryAssignee, createdWorkOrder);
-        
-        // Create in-app notification
         await notificationController.createNotification({
           type: 'new_task',
           title: 'New Work Order Assigned',
@@ -335,12 +464,13 @@ exports.createWorkOrder = async (req, res, next) => {
         });
       }
     }
-    
+
     return responseHandler.success(res, 201, 'Work order created successfully', createdWorkOrder);
   } catch (error) {
     next(error);
   }
 };
+
 
 /**
  * Update work order
@@ -513,35 +643,38 @@ exports.deleteWorkOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { companyId, role } = req.user;
-    
-    // Only admin can delete work orders
+
+    console.log('Request id:', id);
+    console.log('User companyId:', companyId);
+    console.log('User role:', role);
+
     if (role !== 'admin') {
       return responseHandler.error(res, 403, 'Only admin can delete work orders');
     }
-    
-    // Find work order
+
     const workOrder = await WorkOrder.findOne({
       where: { id, companyId }
     });
-    
+
+    console.log('workOrder found:', workOrder);
+
     if (!workOrder) {
       return responseHandler.error(res, 404, 'Work order not found');
     }
-    
-    // Delete work order parts associations first
-    await WorkOrderParts.destroy({
-      where: { workOrderId: id }
-    });
-    
-    // Delete work order (soft delete)
-    await workOrder.update({ isDeleted: true });
-    await workOrder.destroy(); // هذا سيقوم بالحذف الناعم (soft delete) بفضل إعدادات paranoid
-    
+
+    // await WorkOrderParts.destroy({
+    //   where: { workOrderId: id }
+    // });
+
+    await workOrder.destroy();
+
     return responseHandler.success(res, 200, 'Work order deleted successfully');
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };
+
 
 /**
  * Upload work order images

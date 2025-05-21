@@ -49,6 +49,12 @@ const WorkOrders = () => {
     }
   }, [location.search]);
 
+  useEffect(() => {
+  if (['list', 'calendar', 'columns', 'deleted'].includes(view)) {
+    fetchWorkOrders();
+  }
+}, [view, filters]);
+
   const fetchWorkOrders = async () => {
     setLoading(true);
     setError(null);
@@ -139,28 +145,28 @@ const WorkOrders = () => {
         fetchWorkOrders();
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Error deleting work order');
-      console.error('Error deleting work order:', err);
+       console.error('Error deleting work order:', err);
+  setError(err.response?.data?.message || 'Error deleting work order');
     } finally {
       setLoading(false);
     }
   };
 
-  const restoreWorkOrder = async (id) => {
-    setLoading(true);
-    setError(null);
-    try {
-      await axios.put(`${API_URL}/api/work-orders/${id}/restore`, null, { withCredentials: true });
-      setSuccess('Work order restored successfully');
-      fetchWorkOrders();
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error restoring work order');
-      console.error('Error restoring work order:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+const restoreWorkOrder = async (id) => {
+  setLoading(true);
+  setError(null);
+  try {
+    await axios.put(`${API_URL}/api/work-orders/${id}/restore`, null, { withCredentials: true });
+    setSuccess('Work order restored successfully');
 
+    setWorkOrders(prev => prev.filter(order => order.id !== id));
+  } catch (err) {
+    setError(err.response?.data?.message || 'Error restoring work order');
+    console.error('Error restoring work order:', err);
+  } finally {
+    setLoading(false);
+  }
+};
   const handleStatusChange = async (workOrderId, newStatus) => {
     try {
       await axios.put(`${API_URL}/api/work-orders/${workOrderId}`, { status: newStatus }, { withCredentials: true });

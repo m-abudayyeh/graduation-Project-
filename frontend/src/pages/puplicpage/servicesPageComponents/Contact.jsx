@@ -1,6 +1,61 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 
 const ContactSection = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    companyName: '',
+    industry: '',
+    message: ''
+  });
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStatus, setFormStatus] = useState({
+    type: '',
+    message: ''
+  });
+  
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    });
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setFormStatus({ type: '', message: '' });
+    
+    try {
+      const response = await axios.post('http://localhost:5000/api/custom-solutions', formData);
+      
+      if (response.data.success) {
+        setFormStatus({
+          type: 'success',
+          message: 'Thank you! Your message has been sent successfully.'
+        });
+        // Clear form fields
+        setFormData({
+          name: '',
+          email: '',
+          companyName: '',
+          industry: '',
+          message: ''
+        });
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setFormStatus({
+        type: 'error',
+        message: error.response?.data?.message || 'Failed to send your message. Please try again later.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="py-16 bg-white">
       <div className="container mx-auto px-4">
@@ -9,7 +64,7 @@ const ContactSection = () => {
             {/* Content */}
             <div className="md:w-1/2 p-8 md:p-12">
               <h2 className="text-3xl font-bold text-white mb-4">
-                Need a Custom  System?
+                Need a Custom System?
               </h2>
               <p className="text-gray-300 mb-6">
                 Our team of experts is ready to design the perfect solution for your facility's unique challenges. 
@@ -37,9 +92,6 @@ const ContactSection = () => {
               </div>
               
               <div className="flex space-x-4">
-                {/* <a href="#" className="inline-block py-2 px-4 bg-[#FF5E14] text-white font-medium rounded-lg hover:bg-[#e5540c] transition duration-300">
-                  Schedule a Call
-                </a> */}
                 <a href="/about" className="inline-block py-2 px-4 bg-white border border-white text- font-medium rounded-lg hover:bg-transparent hover:text-white transition duration-300">
                   Learn More
                 </a>
@@ -52,7 +104,13 @@ const ContactSection = () => {
                 Get a Free Consultation
               </h3>
               
-              <form className="space-y-4">
+              {formStatus.message && (
+                <div className={`p-4 mb-6 rounded-lg ${formStatus.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {formStatus.message}
+                </div>
+              )}
+              
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-[#5F656F] mb-1">
@@ -63,6 +121,9 @@ const ContactSection = () => {
                       id="name" 
                       className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#FF5E14]" 
                       placeholder="Your name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
                     />
                   </div>
                   
@@ -75,19 +136,25 @@ const ContactSection = () => {
                       id="email" 
                       className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#FF5E14]" 
                       placeholder="your@email.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
                 
                 <div>
-                  <label htmlFor="company" className="block text-sm font-medium text-[#5F656F] mb-1">
+                  <label htmlFor="companyName" className="block text-sm font-medium text-[#5F656F] mb-1">
                     Company Name
                   </label>
                   <input 
                     type="text" 
-                    id="company" 
+                    id="companyName" 
                     className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#FF5E14]" 
                     placeholder="Company Inc."
+                    value={formData.companyName}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
                 
@@ -98,8 +165,11 @@ const ContactSection = () => {
                   <select 
                     id="industry" 
                     className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#FF5E14]"
+                    value={formData.industry}
+                    onChange={handleChange}
+                    required
                   >
-                    <option value="" disabled selected>Select your industry</option>
+                    <option value="" disabled>Select your industry</option>
                     <option value="manufacturing">Manufacturing</option>
                     <option value="food">Food & Beverage</option>
                     <option value="healthcare">Healthcare</option>
@@ -119,14 +189,20 @@ const ContactSection = () => {
                     rows="4" 
                     className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#FF5E14]" 
                     placeholder="Describe your challenges and requirements..."
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
                   ></textarea>
                 </div>
                 
                 <button 
                   type="submit" 
-                  className="w-full bg-[#FF5E14] hover:bg-[#e5540c] text-white font-medium py-3 px-6 rounded-lg transition duration-300"
+                  className={`w-full ${
+                    isSubmitting ? 'bg-gray-400' : 'bg-[#FF5E14] hover:bg-[#e5540c]'
+                  } text-white font-medium py-3 px-6 rounded-lg transition duration-300`}
+                  disabled={isSubmitting}
                 >
-                  Request Consultation
+                  {isSubmitting ? 'Sending...' : 'Request Consultation'}
                 </button>
               </form>
             </div>

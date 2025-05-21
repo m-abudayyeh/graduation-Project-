@@ -99,7 +99,7 @@ module.exports = {
       },
       deletedAt: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true // This allows the soft delete field to be nullable
       },
       companyId: {
         type: Sequelize.INTEGER,

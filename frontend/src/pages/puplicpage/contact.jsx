@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import ContactHeader from "./contactComponents/ContactHeader";
 import ContactForm from "./contactComponents/ContactForm"
 import ContactInfo from "./contactComponents/ContactInfo";

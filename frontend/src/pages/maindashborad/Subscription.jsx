@@ -25,13 +25,13 @@ const Subscription = () => {
       setError(null);
 const userData = JSON.parse(sessionStorage.getItem('user'));
 const companyId = userData?.companyId;
-// console.log(companyId);
+console.log(companyId);
       const response = await axios.get(`${API_URL}/api/subscriptions/company/${companyId}`,
         
         {
         withCredentials: true, // Ensure cookies are sent with the request
       });
-// console.log(response.data.data.company);
+console.log(response.data.data.company);
       setSubscription(response.data.data.company);
       setHistory(response.data.data.subscriptions);
       setLoading(false);

@@ -20,7 +20,7 @@ exports.getCompanySubscription = async (req, res, next) => {
     const { role, companyId: userCompanyId } = req.user;
     
     // Check access permissions
-    if (parseInt(companyId) !== userCompanyId && role !== 'super_admin') {
+    if (parseInt(companyId) !== userCompanyId && role !== 'admin') {
       return responseHandler.error(res, 403, 'You do not have permission to access this subscription');
     }
     
