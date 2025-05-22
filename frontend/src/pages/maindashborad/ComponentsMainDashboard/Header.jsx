@@ -103,7 +103,7 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
         </div>
 
         <div className="flex items-center space-x-6">
-          {/* Notification Bell */}
+          {/* Notification Bell
           <div className="relative cursor-pointer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +122,7 @@ const Header = ({ user, companyInfo, onLogout, toggleSidebar }) => {
             <span className="absolute -top-1 -right-1 h-5 w-5 bg-[#FF5E14] rounded-full text-xs text-white flex items-center justify-center font-semibold">
               3
             </span>
-          </div>
+          </div> */}
 
           {/* Status Selector */}
           <div className="hidden md:flex items-center space-x-2 border-r border-gray-300 pr-6">

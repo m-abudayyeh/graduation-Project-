@@ -30,11 +30,11 @@ const SuperAdminSidebar = ({ isOpen, toggleSidebar, user }) => {
     path: '/admin',
     icon: 'M3 3h18M3 9h18M3 15h18M3 21h18' // أيقونة خطوط dashboard (قائمة إدارية)
   },
-  {
-    name: 'Users',
-    path: '/admin/users',
-    icon: 'M17 20h5v-2a4 4 0 00-5-4m-6 6H2v-2a4 4 0 014-4h4a4 4 0 014 4v2zm1-10a4 4 0 11-8 0 4 4 0 018 0z' // أيقونة شخصين
-  },
+  // {
+  //   name: 'Users',
+  //   path: '/admin/users',
+  //   icon: 'M17 20h5v-2a4 4 0 00-5-4m-6 6H2v-2a4 4 0 014-4h4a4 4 0 014 4v2zm1-10a4 4 0 11-8 0 4 4 0 018 0z' // أيقونة شخصين
+  // },
   {
     name: 'Massege',
     path: '/admin/massege',

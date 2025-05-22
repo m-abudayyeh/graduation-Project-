@@ -71,7 +71,7 @@ const WorkOrderColumnView = ({ workOrders, onSelectWorkOrder, onStatusChange }) 
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               onClick={() => onSelectWorkOrder(workOrder.id)}
-                              className="bg-white rounded-md p-3 shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow duration-200"
+                              className=" bg-white rounded-md p-3 shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow duration-200"
                             >
                               <div className="font-medium text-sm mb-1 truncate">{workOrder.title}</div>
                               <div className="flex items-center text-xs text-gray-500 mb-2">

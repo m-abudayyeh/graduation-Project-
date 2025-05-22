@@ -1,168 +1,167 @@
-#  OptiPlant – Factory Maintenance & Task Management System
+# OptiPlant – Factory Maintenance & Task Management System
 
-[![Live Demo](https://img.shields.io/badge/Figma-Preview-blue?style=flat&logo=figma)](https://www.figma.com/design/zDGa6WPRS2pSSsP0OCp4tp/Graduation-project?node-id=0-1&t=5KEMVibbXcJ1Tplp-1)
-
-##  Project Overview
-
-**OptiPlant** is a web-based platform designed to streamline **maintenance task management** in factories and industrial environments. It enables organizations to track work orders, schedule preventive maintenance, manage assets, and monitor operations in real time.
+[![Live Demo](https://img.shields.io/badge/Figma-Preview-blue?style=flat&logo=figma)](https://www.figma.com/design/zDGa6WPRS2pSSsP0OCp4tp/Graduation-project?node-id=0-1&t=5KEMVibbXcJ1Tplp-1)  
+[![Trello Board](https://img.shields.io/badge/Trello-Board-blue?style=flat&logo=trello)](https://trello.com/invite/b/682e9e14e41641bf20fe00df/ATTI8582d8f860fb5128e0c625df5977a72b281ED1F6/garduation-project)
 
 ---
 
-##  Target Users
+## Website Overview
 
-- Factory Managers  
-- Maintenance Supervisors  
-- Technicians  
-- Requesters  
-- System Monitors
+**OptiPlant** is a comprehensive digital platform for managing tasks and maintenance operations in factories and industrial facilities. It helps factory managers, supervisors, technicians, and other users streamline maintenance operations, manage assets, track tasks, and optimize overall efficiency.
 
----
+In addition, the system allows factories to contact the company behind the platform to request a custom version tailored to their specific operational structure. These customized solutions may include:
 
-##  Core Features
+- Production management and workflow control  
+- Quality assurance and defect reduction  
+- Scrap/waste tracking and reduction  
+- Improved inter-departmental communication  
+- Energy monitoring and efficiency planning  
+- Remote machine control (turn on/off)  
+- Machine performance tracking and optimization  
 
--  Work Order Management  
-- Preventive Maintenance Scheduling  
-- Real-time Analytics and Reports  
--  Maintenance Request Submission  
--  Location, Machine, Store, and Employee Management  
--  Notification System  
-- Subscription and Payment System  
+This makes the platform not only a maintenance management tool but also a smart, scalable foundation for industrial digital transformation.
 
 ---
 
-##  Website Structure
+## General Purpose
 
-###  Public Pages
-- Home
-- About Us
-- Contact Us
-- Services
-- Registration & Login
+- Organize and assign maintenance tasks  
+- Monitor equipment and schedule preventive maintenance  
+- Analyze performance and productivity  
+- Manage resources including machines, locations, spare parts, and employees  
+- Provide custom system development tailored to each factory’s structure  
+- Support production monitoring, quality control, and scrap reduction  
+- Enable remote control of machines and energy usage tracking  
+- Improve communication across departments  
 
-###  Dashboard (After Login)
-- Work Orders  
-- Preventive Maintenance  
-- Analytics  
-- Requests  
-- Locations  
-- Machines  
-- Store  
-- Employees  
-- User Profile  
-- Company Profile  
-- Notifications  
+---
 
-###  Super Admin Panel
-- Manage Contact Messages  
-- Global Stats  
-- Manage Companies  
+## Target Users
+
+- Small and medium-sized industrial factories  
+- Large manufacturing facilities with multiple departments  
+- Energy-conscious factories aiming for efficiency and automation  
+- Companies seeking to digitize operations and reduce unplanned downtime  
+- Industrial businesses looking for customized software solutions  
+
+---
+
+## Public Pages (No Login Required)
+
+- **Home Page**: Overview of core features, benefits, and access to free trial  
+- **About Us**: Company vision and platform background  
+- **Contact Us**: A direct form for technical/sales inquiries  
+- **Service Page**: Dedicated to custom solutions, highlighting production tracking, energy monitoring, and more  
+- **Register / Login Page**: Secure access to free trial or paid subscription  
+
+---
+
+## Registration & Access Cycle
+
+1. Visitors explore public pages  
+2. Register for a 7-day free trial  
+3. Upon registration, the user becomes the company’s Admin  
+4. After trial, subscription required ($20/month or $216/year)  
+
+---
+
+## Dashboard Pages (After Login)
+
+- **Work Orders**: Create, assign, and track maintenance tasks (Calendar, Kanban, Table)  
+- **Preventive Maintenance**: Schedule recurring maintenance  
+- **Analytics**: Real-time performance metrics  
+- **Requests**: Maintenance request management  
+- **Machines**: Register/manage machine data  
+- **Locations**: Organize physical areas  
+- **Store**: Manage spare part inventory  
+- **Employees**: Add/manage staff & roles  
+- **User Profile**: Update user status  
+- **Company Profile**: Admin-level company data  
+- **Notifications**: Task alerts, approvals, maintenance, subscriptions  
+
+---
+
+## Super Admin Dashboard
+
+- Monitor companies and users  
+- View **Contact Us** messages  
 - Manage FAQs  
-- Manage Subscriptions & Payments  
+- System-wide statistics  
+- Handle subscriptions and payment records  
 
 ---
 
-##  User Roles & Permissions
+## Advanced Features (Customizable Add-ons)
 
-| Role         | Permissions |
-|--------------|-------------|
-| **Admin**     | Full access to all data and users |
-| **Supervisor**| Manage tasks, store, preventive maintenance |
-| **Technician**| Execute/update tasks, view machines & store |
-| **Requester** | Submit maintenance requests |
-| **Viewer**    | View only |
-| **Super Admin**| Manage full platform and companies |
+### 1. Custom System Development
+- Tailored platforms for factory-specific workflows  
+- Custom modules based on business model  
+
+### 2. Production Management Module (Optional)
+- Track output, defects, downtime, and plans  
+- Optimize labor, materials, and machines  
+
+### 3. Sensor & IoT Integration
+- Connect sensors and monitors  
+- Real-time energy/machine data  
+- Remotely control devices  
+- Visualize power usage trends  
 
 ---
 
-##  Registration & Authentication
+## Technology Stack
 
-- Email Verification  
-- 7-Day Free Trial  
-- Login with Password Recovery  
+### Backend
+- Node.js / Express  
+- MVC Architecture  
+- PostgreSQL (Sequelize CLI)  
 - JWT Authentication  
-
----
-
-##  Analytics Dashboard
-
-- Open Tasks Count  
-- Requests Summary  
-- Preventive Schedules  
-- Filterable Reports  
-
----
-
-##  Pricing
-
-- **$Free / 7Days** 
-- **$20 / month**  
-- **$216 / year**  
-- Reminders for subscription expiry
-
----
-
-##  Tech Stack
-
-###  Backend
-- Node.js, Express, MVC  
-- PostgreSQL + Sequelize  
-- JWT Auth  
+- Stripe Payment Integration  
 - .env Configuration  
 
-###  Frontend
-- React (Vite)  
+### Frontend
+- React (Vite JS)  
 - Tailwind CSS  
-- Axios  
-- EmailJS for contact system  
 
 ---
 
-## 🎨 Color Palette
+## Payment & Subscription System
 
-| Color | Hex |
-|-------|-----|
-| Orange | `#FF5E14` |
-| Gray   | `#5F656F` |
-| Light  | `#F5F5F5` |
-| Blue   | `#02245B` |
-
----
-
-##  Notification System
-
-- New Task Assignments  
-- Request Status Updates  
-- Preventive Maintenance Alerts  
-- Subscription Expiry Reminders  
+- 7-Day Free Trial  
+- Monthly Plan: $20  
+- Yearly Plan: $216  
+- Auto-renewal with alerts  
+- Seamless trial-to-paid transition  
 
 ---
 
-##  Figma Design
+## Notification System
 
-[🔗 View Design on Figma](https://www.figma.com/design/zDGa6WPRS2pSSsP0OCp4tp/Graduation-project?node-id=0-1&t=5KEMVibbXcJ1Tplp-1)
-
----
-
-## 📄 Project Documentation
-
--  [Brief Summary (PDF)](./brief.pdf)
--  [Full Description (PDF)](./Full%20Description.pdf)
+- New task assignments  
+- Request updates  
+- Preventive maintenance alerts  
+- Subscription expiration reminders  
 
 ---
 
-##  Usage Flow
+## Color Theme
 
-1. Browse public pages  
-2. Register with your company  
-3. Get 7-day trial and explore dashboard  
-4. Add users, machines, tasks, etc.  
-5. Upgrade to paid plan after trial ends  
+| Name          | Hex       |
+|---------------|-----------|
+| Primary Orange | `#FF5E14` |
+| Dark Gray      | `#5F656F` |
+| Light Gray     | `#F5F5F5` |
+| Deep Blue      | `#02245B` |
 
 ---
 
-##  Contact
+## Project Documentation
+
+- [Brief Summary (PDF)](./brief.pdf)  
+- [Full Description (PDF)](./Full%20Description.pdf)  
+
+---
+
+## Contact
 
 For feedback or support, please use the **Contact Us** form on the website.
-
----
-
